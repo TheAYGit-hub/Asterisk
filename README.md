@@ -1,4 +1,4 @@
-![Snap! Logo](src/asterisk_logo.png)
+![Asterisk* Logo](src/asterisk_logo.png)
 # Asterisk<em>*</em>
 
 <!-- [https://snap.berkeley.edu][snap]

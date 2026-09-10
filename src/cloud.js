@@ -2,7 +2,7 @@
 
     cloud.js
 
-    a backend API for SNAP!
+    a backend API for Asterisk*
 
     written by Bernat Romagosa
     inspired by the original cloud API by Jens Mönig
@@ -10,9 +10,9 @@
     Copyright (C) 2018 by Bernat Romagosa
     Copyright (C) 2015 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -28,7 +28,7 @@
 */
 
 // Global settings /////////////////////////////////////////////////////
-// cloud.js should be able to exist indepent of Snap!
+// cloud.js should be able to exist indepent of Asterisk*
 // (The module date is included for simplicity, but is not needed elsewhere.)
 
 /*global modules, hex_sha512*/
@@ -62,14 +62,14 @@ Cloud.prototype.disable = function () {
 Cloud.MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 Cloud.prototype.knownDomains = {
-    'Snap!Cloud' : 'https://snap.berkeley.edu',
-    'Snap!Cloud (cs10)' : 'https://snap-cloud.cs10.org',
-    'Snap!Cloud (staging)': 'https://snap-staging.cs10.org',
+    'Asterisk*Cloud' : 'https://snap.berkeley.edu',
+    'Asterisk*Cloud (cs10)' : 'https://snap-cloud.cs10.org',
+    'Asterisk*Cloud (staging)': 'https://snap-staging.cs10.org',
     'localhost': 'http://localhost:8080',
     'localhost (secure)': 'https://localhost:4431'
 };
 
-Cloud.prototype.defaultDomain = Cloud.prototype.knownDomains['Snap!Cloud'];
+Cloud.prototype.defaultDomain = Cloud.prototype.knownDomains['Asterisk*Cloud'];
 
 Cloud.prototype.determineCloudDomain = function () {
     // We dynamically determine the domain of the cloud server.
@@ -150,7 +150,7 @@ Cloud.prototype.encodeDict = function (dict) {
 
 Cloud.genericErrorMessage =
     'There was an error while trying to access\n' +
-    'a Snap!Cloud service. Please try again later.';
+    'a Asterisk*Cloud service. Please try again later.';
 
 Cloud.prototype.genericError = function () {
     throw new Error(Cloud.genericErrorMessage);
@@ -251,7 +251,7 @@ Cloud.prototype.withCredentialsRequest = function (
                     wantsRawResponse,
                     body);
             } else {
-                onError.call(this, 'You are not logged in', 'Snap!Cloud');
+                onError.call(this, 'You are not logged in', 'Asterisk*Cloud');
             }
         }
     );
@@ -434,7 +434,7 @@ Cloud.prototype.saveProject = function (projectName, body, onSuccess, onError) {
                     body // POST body
                 );
             } else {
-                onError.call(this, 'You are not logged in', 'Snap!Cloud');
+                onError.call(this, 'You are not logged in', 'Asterisk*Cloud');
             }
         }
     );

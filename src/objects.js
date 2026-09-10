@@ -11,9 +11,9 @@
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -98,6 +98,7 @@ CustomBlockDefinition, exportEmbroidery, CustomHatBlockMorph, HandMorph*/
 
 modules.objects = '2026-August-27';
 
+var Nil
 var SpriteMorph;
 var StageMorph;
 var SpriteBubbleMorph;
@@ -120,6 +121,7 @@ function isSnapObject(thing) {
     return thing instanceof SpriteMorph || (thing instanceof StageMorph);
 }
 
+Nil = class Nil {}
 // SpriteMorph /////////////////////////////////////////////////////////
 
 // I am a scriptable object
@@ -151,27 +153,48 @@ SpriteMorph.prototype.attributes =
 SpriteMorph.prototype.categories =
     [
         'motion',
-        'looks',
-        'sound',
-        'pen',
         'control',
-        'sensing',
-        'operators',
+        'costumes',
+        'sprites',
+        'strings',
         'variables',
+        'pen',
+        'structs',
+        'project',
+        'sound',
+
+        'machines',
+        'events',
+        'looks',
+        'sensing',
+        'numbers',
         'lists',
+        'vectors',
+        'bigints',
+        'lambda',
         'other'
     ];
 
 SpriteMorph.prototype.blockColor = {
-    motion : new Color(74, 108, 212),
+    motion : new Color(72, 108, 212),
+    machines : new Color(49, 72, 170),
+    control : new Color(231, 168, 34),
+    events : new Color(200, 131, 48),
+    costumes : new Color(90, 70, 230),
     looks : new Color(143, 86, 227),
-    sound : new Color(207, 74, 217),
-    pen : new Color(0, 161, 120),
-    control : new Color(230, 168, 34),
+    sprites : new Color(60, 70, 150),
     sensing : new Color(4, 148, 220),
-    operators : new Color(98, 194, 19),
+    strings : new Color(17, 200, 163),
+    numbers : new Color(98, 194, 19),
     variables : new Color(243, 118, 29),
     lists : new Color(217, 77, 17),
+    pen : new Color(0, 161, 120),
+    vectors : new Color(107, 171, 255),
+    structs : new Color(90, 100, 230),
+    bigints : new Color(230, 104, 19),
+    project : new Color(115, 180, 240),
+    lambda : new Color(170, 26, 75),
+    sound : new Color(207, 74, 217),
     other: new Color(150, 150, 150)
 };
 
@@ -253,6 +276,22 @@ SpriteMorph.prototype.primitiveBlocks = function () {
             defaults: [10],
             animation: true,
             code: 'move',
+            src: `(
+                (prim t forward steps)
+                (goto (+ (pos) (*
+                    (list
+                        (fn [sin] (dir))
+                        (fn [cos] (dir)))
+                    (get steps)))))`
+        },
+        forwardDirection: {
+            only: SpriteMorph,
+            type: 'command',
+            category: 'motion',
+            spec: 'move %n steps in direction %dir',
+            defaults: [10, 90],
+            animation: true,
+            code: 'moveDirection',
             src: `(
                 (prim t forward steps)
                 (goto (+ (pos) (*
@@ -828,7 +867,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
             defaults: [60, 0.5],
             code: 'note'
         },
-        doPlayFrequency: { // only in dev mode - experimental
+        doPlayFrequency: {
             dev: true,
             type: 'command',
             category: 'sound',
@@ -1314,13 +1353,13 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         },
         doRun: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'run %cmdRing %inputs',
             code: 'run'
         },
         fork: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'launch %cmdRing %inputs',
             src: `(
                 (prim t fork script inputs)
@@ -1329,28 +1368,34 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         evaluate: {
             type: 'reporter',
             reports: 'any',
-            category: 'control',
+            category: 'lambda',
             spec: 'call %repRing %inputs',
             code: 'call'
         },
         doReport: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'report %s',
             code: 'report'
+        },
+        doIgnore: {
+            type: 'command',
+            category: 'lambda',
+            spec: 'ignore %s',
+            code: 'ignore'
         },
         doCallCC: {
             // deprecated - superseded by reportEnviornment - kept for legacy
             dev: true,
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'run %cmdRing w/continuation'
         },
         reportCallCC: {
             // deprecated - superseded by reportEnviornment - kept for legacy
             dev: true,
             type: 'reporter',
-            category: 'control',
+            category: 'lambda',
             spec: 'call %cmdRing w/continuation'
         },
         doWarp: {
@@ -1426,28 +1471,28 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         // Custom Blocks & introspection
         doDefineBlock: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'define %upvar %s %repRing',
             defaults: [['block']],
             code: 'define'
         },
         doSetBlockAttribute: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'set %byob of block %repRing to %s',
             defaults: [['label']],
             code: 'setBlock'
         },
         doDeleteBlock: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'delete block %repRing',
             code: 'deleteBlock'
         },
         reportBlockAttribute: {
             type: 'reporter',
             reports: 'any',
-            category: 'control',
+            category: 'lambda',
             spec: '%block of block %repRing',
             defaults: [['definition']],
             code: 'block'
@@ -1464,13 +1509,13 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         // custom block slot control & dynamic user defined drop-down menus
         receiveSlotEvent: {
             type: 'hat',
-            category: 'control',
+            category: 'lambda',
             spec: 'when slot %inputSlot signals %slotEvent',
             defaults: ['', ['menu']]
         },
         doSetSlot: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: 'set slot %inputSlot to %s'
         },
 
@@ -1495,7 +1540,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportPipe: {
             type: 'reporter',
             reports: 'any',
-            category: 'control',
+            category: 'lambda',
             spec: 'pipe %s $arrowRight %mult%repRing',
             code: 'pipe',
             src: `(
@@ -1510,28 +1555,28 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportNewProcess: {
             type: 'reporter',
             reports: 'process',
-            category: 'control',
+            category: 'lambda',
             spec: 'new process %cmdRing %inputs',
             code: 'process'
         },
         reportProcessAttribute: {
             type: 'reporter',
             reports: 'any',
-            category: 'control',
+            category: 'lambda',
             spec: '%procAttribs of process %p',
             defaults: [['script']],
             code: 'getProcess'
         },
         reportProcessState: {
             type: 'predicate',
-            category: 'control',
+            category: 'lambda',
             spec: 'is process %p %procStates ?',
             defaults: [null, ['running']],
             code: 'isProcess'
         },
         doChangeProcess: {
             type: 'command',
-            category: 'control',
+            category: 'lambda',
             spec: '%procActions process %p',
             defaults: [['pause']],
             code: 'changeProcess'
@@ -1774,10 +1819,18 @@ SpriteMorph.prototype.primitiveBlocks = function () {
             alias: 'predicate ring lambda',
             code: 'pred'
         },
+        toNumber: {
+            type: 'reporter',
+            reports: 'number',
+            category: 'numbers',
+            spec: 'number %n',
+            alias: 'number',
+            code: 'number'
+        },
         reportVariadicSum: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%sum',
             alias: '+',
             code: '+'
@@ -1785,7 +1838,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportDifference: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%n \u2212 %n',
             alias: '-',
             code: '-'
@@ -1793,7 +1846,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportVariadicProduct: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%product',
             alias: '*',
             code: '*'
@@ -1801,21 +1854,21 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportQuotient: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%n / %n', // '%n \u00F7 %n'
             code: '/'
         },
         reportRound: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: 'round %n',
             code: 'round'
         },
         reportMonadic: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%fun of %n',
             defaults: [['sqrt'], 10],
             code: 'fn'
@@ -1823,28 +1876,28 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportPower: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%n ^ %n',
             code: '^'
         },
         reportModulus: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: '%n mod %n',
             code: 'mod'
         },
         reportAtan2: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: 'atan2 %n ÷ %n',
             code: 'atan2'
         },
         reportVariadicMin: {
             type: 'reporter',
             reports: 'any',
-            category: 'operators',
+            category: 'numbers',
             spec: '%min',
             alias: 'min',
             code: 'min'
@@ -1852,7 +1905,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportVariadicMax: {
             type: 'reporter',
             reports: 'any',
-            category: 'operators',
+            category: 'numbers',
             spec: '%max',
             alias: 'max',
             code: 'max'
@@ -1860,64 +1913,64 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportRandom: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'numbers',
             spec: 'pick random %ns to %ns',
             defaults: [1, 10],
             code: 'rand'
         },
         reportVariadicEquals: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all=',
             code: '='
         },
         reportVariadicNotEquals: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all!=',
             code: '!='
         },
         reportVariadicLessThan: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all<',
             code: '<'
         },
         reportVariadicLessThanOrEquals: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all<=',
             code: '<='
         },
         reportVariadicGreaterThan: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all>',
             code: '>'
         },
         reportVariadicGreaterThanOrEquals: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all>=',
             code: '>='
         },
         reportVariadicAnd: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%all',
             alias: '&',
             code: 'and'
         },
         reportVariadicOr: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%any',
             alias: '|',
             code: 'or'
         },
         reportNot: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: 'not %b',
             code: 'not',
             src: `(
@@ -1926,7 +1979,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         },
         reportBoolean: {
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%bool',
             defaults: [true],
             alias: 'true boolean',
@@ -1937,23 +1990,79 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         },
         reportFalse: { // special case for keyboard entry and search
             type: 'predicate',
-            category: 'operators',
+            category: 'numbers',
             spec: '%bool',
             defaults: [false],
             alias: 'false boolean'
         },
+        
+        reportVariadicIsIdentical: {
+            type: 'predicate',
+            category: 'numbers',
+            spec: 'is %all== ?',
+            code: 'same'
+        },
+        reportTypeOf: { // only in dev mode for debugging
+            dev: true,
+            type: 'reporter',
+            reports: 'text',
+            category: 'numbers',
+            spec: 'type of %s',
+            defaults: [5]
+        },
+        reportTextFunction: { // only in dev mode - experimental
+            dev: true,
+            type: 'reporter',
+            reports: 'text',
+            category: 'numbers',
+            spec: '%txtfun of %s',
+            defaults: [['encode URI'], "Abelson & Sussman"]
+        },
+        reportCompiled: { // experimental
+            dev: true,
+            type: 'reporter',
+            category: 'numbers',
+            spec: 'compile %repRing for %n args',
+            defaults: [null, 0]
+        },
+        
+        reportIsA: {
+            type: 'predicate',
+            category: 'numbers',
+            spec: 'is %s a %typ ?',
+            defaults: [5, ['number']],
+            code: 'is'
+        },
+        
+        reportJSFunction: {
+            type: 'reporter',
+            category: 'numbers',
+            spec: 'javascript %mult%s code %code',
+            code: 'js'
+        },
+        reportNil: {
+            type: 'reporter',
+            reports: 'nil',
+            category: 'numbers',
+            spec: 'nothing',
+            alias: 'nil nothing',
+            code: 'nil'
+        },
+
+        // Strings
         reportJoinWords: {
             type: 'reporter',
             reports: 'text',
-            category: 'operators',
+            category: 'strings',
             spec: 'join %words',
             defaults: [localize('hello') + ' ', localize('world')],
             code: 'join'
         },
+        
         reportLetter: {
             type: 'reporter',
             reports: 'text',
-            category: 'operators',
+            category: 'strings',
             spec: 'letter %ix of %txt',
             defaults: [1, localize('world')],
             code: 'letter',
@@ -1967,14 +2076,14 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportStringSize: { // deprecated as of v9
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'strings',
             spec: 'length of %s',
             defaults: [localize('world')]
         },
         reportTextAttribute: {
             type: 'reporter',
             reports: 'text',
-            category: 'operators',
+            category: 'strings',
             spec: '%ta of text %txt',
             defaults: [['length'], localize('world')],
             code: 'text'
@@ -1982,7 +2091,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportUnicode: {
             type: 'reporter',
             reports: 'number',
-            category: 'operators',
+            category: 'strings',
             spec: 'unicode of %txt',
             defaults: ['a'],
             code: 'unicode'
@@ -1990,60 +2099,18 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         reportUnicodeAsLetter: {
             type: 'reporter',
             reports: 'text',
-            category: 'operators',
+            category: 'strings',
             spec: 'unicode %n as letter',
             defaults: [65],
             code: 'toLetter'
         },
-        reportIsA: {
-            type: 'predicate',
-            category: 'operators',
-            spec: 'is %s a %typ ?',
-            defaults: [5, ['number']],
-            code: 'is'
-        },
-        reportVariadicIsIdentical: {
-            type: 'predicate',
-            category: 'operators',
-            spec: 'is %all== ?',
-            code: 'same'
-        },
         reportTextSplit: {
             type: 'reporter',
             reports: 'list',
-            category: 'operators',
+            category: 'strings',
             spec: 'split %s by %delim',
             defaults: [localize('hello') + ' ' + localize('world'), " "],
             code: 'split'
-        },
-        reportJSFunction: {
-            type: 'reporter',
-            category: 'operators',
-            spec: 'JavaScript function ( %mult%s ) { %code }',
-            code: 'js'
-        },
-        reportTypeOf: { // only in dev mode for debugging
-            dev: true,
-            type: 'reporter',
-            reports: 'text',
-            category: 'operators',
-            spec: 'type of %s',
-            defaults: [5]
-        },
-        reportTextFunction: { // only in dev mode - experimental
-            dev: true,
-            type: 'reporter',
-            reports: 'text',
-            category: 'operators',
-            spec: '%txtfun of %s',
-            defaults: [['encode URI'], "Abelson & Sussman"]
-        },
-        reportCompiled: { // experimental
-            dev: true,
-            type: 'reporter',
-            category: 'operators',
-            spec: 'compile %repRing for %n args',
-            defaults: [null, 0]
         },
 
         // Variables
@@ -2479,6 +2546,16 @@ SpriteMorph.prototype.primitiveBlocks = function () {
             defaults: [['motion'], ['myself']],
             code: 'video'
         },
+
+        // Vectors
+        reportVec2: {
+            type: 'reporter',
+            reports: 'vec2',
+            category: 'vectors',
+            spec: 'vector x: %n y: %n',
+            defaults: [0, 0],
+            code: 'vec2'
+        },
 // Adding 6 dev primitives to offer compatibility with Snap4Arduino projects
 
         reportConnected: {
@@ -2565,6 +2642,8 @@ SpriteMorph.prototype.primitiveBlocks = function () {
                 )
             )`
         }
+
+        
     };
 };
 
@@ -2991,7 +3070,7 @@ SpriteMorph.prototype.initBlockMigrations = function () {
             selector: 'reportTextAttribute',
             inputs: [['length']],
             offset: 1
-        }
+        },
     };
 };
 
@@ -3884,8 +3963,8 @@ SpriteMorph.prototype.blockTemplates = function (
         }
     });
 
+    // SPRITEBLOCKS
     if (category === 'motion') {
-
         blocks.push(block('forward'));
         blocks.push(block('turn'));
         blocks.push(block('turnLeft'));
@@ -3911,9 +3990,7 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('yPosition', this.inheritsAttribute('y position')));
         blocks.push(watcherToggle('direction'));
         blocks.push(block('direction', this.inheritsAttribute('direction')));
-
     } else if (category === 'looks') {
-
         blocks.push(block('doSwitchToCostume'));
         blocks.push(block('doWearNextCostume'));
         blocks.push(watcherToggle('getCostumeIdx'));
@@ -3946,7 +4023,6 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push('-');
         blocks.push(block('goToLayer'));
         blocks.push(block('goBack'));
-
         // for debugging: ///////////////
         if (devMode) {
             blocks.push('-');
@@ -3957,9 +4033,7 @@ SpriteMorph.prototype.blockTemplates = function (
             blocks.push('-');
             blocks.push(block('doScreenshot'));
         }
-
     } else if (category === 'sound') {
-
         blocks.push(block('playSound'));
         blocks.push(block('doPlaySoundUntilDone'));
         blocks.push(block('doStopAllSounds'));
@@ -3988,18 +4062,9 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('getPan', this.inheritsAttribute('balance')));
         blocks.push('-');
         blocks.push(block('playFreq'));
+        blocks.push(block('doPlayFrequency'));
         blocks.push(block('stopFreq'));
-
-        // for debugging: ///////////////
-        if (devMode) {
-            blocks.push('-');
-            blocks.push(this.devModeText());
-            blocks.push('-');
-            blocks.push(block('doPlayFrequency'));
-        }
-
     } else if (category === 'pen') {
-
         blocks.push(block('clear'));
         blocks.push('-');
         blocks.push(block('down'));
@@ -4028,9 +4093,7 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('reportColor'));
         blocks.push(block('reportColorAttribute'));
         blocks.push(block('reportNewColor'));
-
     } else if (category === 'control') {
-
         blocks.push(block('receiveGo'));
         blocks.push(block('receiveKey'));
         blocks.push(block('receiveInteraction'));
@@ -4040,6 +4103,8 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('doBroadcast'));
         blocks.push(block('doBroadcastAndWait'));
         blocks.push(block('reportPoll'));
+        blocks.push(watcherToggle('getLastMessage'));
+        blocks.push(block('getLastMessage'));
         blocks.push('-');
         blocks.push(block('doWarp'));
         blocks.push('-');
@@ -4051,18 +4116,11 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('doUntil'));
         blocks.push(block('doFor'));
         blocks.push('-');
-        // blocks.push(block('doVariadicIf'));
         blocks.push(block('doIf'));
         blocks.push(block('doIfElse'));
         blocks.push(block('reportIfElse'));
         blocks.push('-');
-        blocks.push(block('doReport'));
         blocks.push(block('doStopThis'));
-        blocks.push('-');
-        blocks.push(block('doRun'));
-        blocks.push(block('fork'));
-        blocks.push(block('evaluate'));
-        blocks.push(block('reportPipe'));
         blocks.push('-');
         blocks.push(block('doTellTo'));
         blocks.push(block('reportAskFor'));
@@ -4076,36 +4134,15 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('doSwitchToScene'));
         blocks.push('-');
         blocks.push(block('receiveUserEdit'));
-        blocks.push(block('doDefineBlock'));
-        blocks.push(block('doDeleteBlock'));
-        blocks.push(block('doSetBlockAttribute'));
-        blocks.push(block('reportBlockAttribute'));
         blocks.push(block('reportEnvironment'));
-        blocks.push('-');
-        blocks.push(block('receiveSlotEvent'));
-        blocks.push(block('doSetSlot'));
-        blocks.push('-');
-        blocks.push(block('reportNewProcess'));
-        blocks.push(block('reportProcessAttribute'));
-        blocks.push(block('reportProcessState'));
-        blocks.push(block('doChangeProcess'));
-
         // for debugging: ///////////////
         if (devMode) {
             blocks.push('-');
             blocks.push(this.devModeText());
             blocks.push('-');
-            blocks.push(watcherToggle('getLastMessage'));
-            blocks.push(block('getLastMessage'));
             blocks.push(block('reportHyperZip'));
-        // deprecated - superseded by reportEnviornment - retained for legacy
-            blocks.push('-');
-            blocks.push(block('doCallCC'));
-            blocks.push(block('reportCallCC'));
         }
-
     } else if (category === 'sensing') {
-
         blocks.push(block('reportTouchingObject'));
         blocks.push(block('reportTouchingColor'));
         blocks.push(block('reportColorIsTouchingColor'));
@@ -4132,11 +4169,9 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('reportDate'));
         blocks.push('-');
         blocks.push(block('reportAttributeOf'));
-
         if (SpriteMorph.prototype.enableFirstClass) {
             blocks.push(block('reportGet'));
         }
-
         blocks.push(block('reportObject'));
         blocks.push('-');
         blocks.push(block('reportURL'));
@@ -4146,7 +4181,6 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push('-');
         blocks.push(block('reportGlobalFlag'));
         blocks.push(block('doSetGlobalFlag'));
-
         // for debugging: ///////////////
         if (devMode) {
             blocks.push('-');
@@ -4158,12 +4192,9 @@ SpriteMorph.prototype.blockTemplates = function (
             blocks.push(block('reportFrameCount'));
             blocks.push(block('reportYieldCount'));
         }
-    } else if (category === 'operators') {
-
-        blocks.push(block('reifyScript'));
-        blocks.push(block('reifyReporter'));
-        blocks.push(block('reifyPredicate'));
-        blocks.push('#');
+    } else if (category === 'numbers') {
+        blocks.push(block('toNumber'));
+        blocks.push(block('reportNil'));
         blocks.push('-');
         blocks.push(block('reportVariadicSum'));
         blocks.push(block('reportDifference'));
@@ -4189,17 +4220,8 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('reportNot'));
         blocks.push(block('reportBoolean'));
         blocks.push('-');
-        blocks.push(block('reportJoinWords'));
-        blocks.push(block('reportTextSplit'));
-        blocks.push(block('reportLetter'));
-        blocks.push(block('reportTextAttribute'));
-        blocks.push('-');
-        blocks.push(block('reportUnicode'));
-        blocks.push(block('reportUnicodeAsLetter'));
-        blocks.push('-');
         blocks.push(block('reportIsA'));
         blocks.push(block('reportVariadicIsIdentical'));
-
         if (Process.prototype.enableJS) {
             blocks.push('-');
             blocks.push(block('reportJSFunction'));
@@ -4215,15 +4237,22 @@ SpriteMorph.prototype.blockTemplates = function (
             blocks.push(block('reportTypeOf'));
             blocks.push(block('reportTextFunction'));
         }
-
+    } else if (category === 'strings') {
+        blocks.push(block('reportJoinWords'));
+        blocks.push(block('reportTextSplit'));
+        blocks.push(block('reportLetter'));
+        blocks.push(block('reportTextAttribute'));
+        blocks.push('-');
+        blocks.push(block('reportUnicode'));
+        blocks.push(block('reportUnicodeAsLetter'));
+    } else if (category === 'vectors') {
+        blocks.push(block('reportVec2'));
     } else if (category === 'variables') {
-
         blocks.push(this.makeVariableButton());
         if (this.deletableVariableNames().length > 0) {
             blocks.push(this.deleteVariableButton());
         }
         blocks.push('-');
-
         varNames = this.allGlobalVariableNames(true, all);
         if (varNames.length > 0) {
             varNames.forEach(name => {
@@ -4232,7 +4261,6 @@ SpriteMorph.prototype.blockTemplates = function (
             });
             blocks.push('-');
         }
-
         varNames = this.allLocalVariableNames(true, all);
         if (varNames.length > 0) {
             varNames.forEach(name => {
@@ -4241,21 +4269,17 @@ SpriteMorph.prototype.blockTemplates = function (
             });
             blocks.push('-');
         }
-
         blocks.push(block('doSetVar'));
         blocks.push(block('doChangeVar'));
         blocks.push(block('doShowVar'));
         blocks.push(block('doHideVar'));
         blocks.push(block('doDeclareVariables'));
-
         // inheritance:
-
         if (StageMorph.prototype.enableInheritance) {
             blocks.push('-');
             blocks.push(block('doDeleteAttr'));
         }
-
-        blocks.push('=');
+    } else if (category === 'lists') {
         blocks.push(block('reportNewList'));
         blocks.push(block('reportNumbers'));
         blocks.push('-');
@@ -4283,29 +4307,59 @@ SpriteMorph.prototype.blockTemplates = function (
         blocks.push(block('reportConcatenatedLists'));
         blocks.push(block('reportReshape'));
         blocks.push(block('reportCrossproduct'));
-
-        if (SpriteMorph.prototype.showingExtensions) {
-            blocks.push('=');
-            blocks.push(block('doPrimitive'));
-            blocks.push(block('doApplyExtension'));
-            blocks.push(block('reportApplyExtension'));
-        }
-
-        if (StageMorph.prototype.enableCodeMapping) {
-            blocks.push('=');
-            blocks.push(block('doMapCodeOrHeader'));
-            blocks.push(block('doMapValueCode'));
-            blocks.push(block('doMapListCode'));
-            blocks.push('-');
-            blocks.push(block('reportMappedCode'));
-        }
-
-        // for debugging: ///////////////
+                // for debugging: ///////////////
         if (this.world()?.isDevMode) {
             blocks.push('-');
             blocks.push(this.devModeText());
             blocks.push('-');
             blocks.push(block('doShowTable'));
+        }
+    } else if (category === 'lambda') {
+        blocks.push(block('reifyScript'));
+        blocks.push(block('reifyReporter'));
+        blocks.push(block('reifyPredicate'));
+        blocks.push('#');
+        blocks.push('-');
+        blocks.push(block('doIgnore'));
+        blocks.push(block('doReport'));
+        blocks.push('-');
+        blocks.push(block('doRun'));
+        blocks.push(block('fork'));
+        blocks.push(block('evaluate'));
+        blocks.push(block('reportPipe'));
+        blocks.push('-');
+        blocks.push(block('doDefineBlock'));
+        blocks.push(block('doDeleteBlock'));
+        blocks.push(block('doSetBlockAttribute'));
+        blocks.push(block('reportBlockAttribute'));
+        blocks.push('-');
+        blocks.push(block('receiveSlotEvent'));
+        blocks.push(block('doSetSlot'));
+        blocks.push('-');
+        blocks.push(block('reportNewProcess'));
+        blocks.push(block('reportProcessAttribute'));
+        blocks.push(block('reportProcessState'));
+        blocks.push(block('doChangeProcess'));
+        if (devMode) {
+            blocks.push('-');
+            blocks.push(this.devModeText());
+        // deprecated - superseded by reportEnviornment - retained for legacy
+            blocks.push('-');
+            blocks.push(block('doCallCC'));
+            blocks.push(block('reportCallCC'));
+        }
+    } else if (category === 'other') {
+        if (SpriteMorph.prototype.showingExtensions) {
+            blocks.push(block('doPrimitive'));
+            blocks.push(block('doApplyExtension'));
+            blocks.push(block('reportApplyExtension'));
+        }
+        if (StageMorph.prototype.enableCodeMapping) {
+            blocks.push(block('doMapCodeOrHeader'));
+            blocks.push(block('doMapValueCode'));
+            blocks.push(block('doMapListCode'));
+            blocks.push('-');
+            blocks.push(block('reportMappedCode'));
         }
     }
 
@@ -4857,9 +4911,9 @@ SpriteMorph.prototype.changeBlockVisibility = function (aBlock, hideIt, quick) {
     }
     dict = {
         doWarp: 'control',
-        reifyScript: 'operators',
-        reifyReporter: 'operators',
-        reifyPredicate: 'operators',
+        reifyScript: 'lambda',
+        reifyReporter: 'lambda',
+        reifyPredicate: 'lambda',
         doDeclareVariables: 'variables'
     };
     cat = dict[aBlock.selector] || aBlock.category;
@@ -10747,7 +10801,7 @@ StageMorph.prototype.init = function (globals) {
     // world map client, transient
     this.worldMap = new WorldMap();
 
-    // Snap! API event listeners, transient
+    // Asterisk* API event listeners, transient
     this.messageCallbacks = {}; // name : [functions]
 
     // Tutorial scenes, transient
@@ -10979,7 +11033,7 @@ StageMorph.prototype.startVideo = function() {
             localize('Camera not supported'),
             localize('Please make sure your web browser is up to date\n' +
                 'and your camera is properly configured. \n\n' +
-                'Some browsers also require you to access Snap!\n' +
+                'Some browsers also require you to access Asterisk*\n' +
                 'through HTTPS to use the camera.\n\n' +
                 'Please replace the "http://" part of the address\n' +
                 'in your browser by "https://" and try again.'),
@@ -11767,13 +11821,12 @@ StageMorph.prototype.blockTemplates = function (
 
     } else
 */
-
+    // STAGEBLOCKS
     if (category === 'looks') {
-
         blocks.push(block('doSwitchToCostume'));
         blocks.push(block('doWearNextCostume'));
         blocks.push(watcherToggle('getCostumeIdx'));
-        blocks.push(block('getCostumeIdx'));
+        blocks.push(block('getCostumeIdx', this.inheritsAttribute('costume #')));
         blocks.push('-');
         blocks.push(block('doSayFor'));
         blocks.push(block('bubble'));
@@ -11791,8 +11844,7 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('show'));
         blocks.push(block('hide'));
         blocks.push(watcherToggle('reportShown'));
-        blocks.push(block('reportShown'));
-
+        blocks.push(block('reportShown', this.inheritsAttribute('shown?')));
         // for debugging: ///////////////
         if (this.world()?.isDevMode) {
             blocks.push('-');
@@ -11803,9 +11855,7 @@ StageMorph.prototype.blockTemplates = function (
             blocks.push('-');
             blocks.push(block('doScreenshot'));
         }
-
     } else if (category === 'sound') {
-
         blocks.push(block('playSound'));
         blocks.push(block('doPlaySoundUntilDone'));
         blocks.push(block('doStopAllSounds'));
@@ -11826,34 +11876,25 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('changeVolume'));
         blocks.push(block('setVolume'));
         blocks.push(watcherToggle('getVolume'));
-        blocks.push(block('getVolume'));
+        blocks.push(block('getVolume', this.inheritsAttribute('volume')));
         blocks.push('-');
         blocks.push(block('changePan'));
         blocks.push(block('setPan'));
         blocks.push(watcherToggle('getPan'));
-        blocks.push(block('getPan'));
+        blocks.push(block('getPan', this.inheritsAttribute('balance')));
         blocks.push('-');
         blocks.push(block('playFreq'));
+        blocks.push(block('doPlayFrequency'));
         blocks.push(block('stopFreq'));
-
-        // for debugging: ///////////////
-        if (this.world()?.isDevMode) {
-            blocks.push('-');
-            blocks.push(this.devModeText());
-            blocks.push('-');
-            blocks.push(block('doPlayFrequency'));
-        }
-
     } else if (category === 'pen') {
-
         blocks.push(block('clear'));
         blocks.push('-');
-        blocks.push(block('setBackgroundColor'));
-        blocks.push(block('changeBackgroundColorDimension'));
-        blocks.push(block('setBackgroundColorDimension'));
+        blocks.push(block('setColor'));
+        blocks.push(block('changePenColorDimension'));
+        blocks.push(block('setPenColorDimension'));
+        blocks.push(block('getPenAttribute'));
         blocks.push('-');
         blocks.push(block('write'));
-        blocks.push('-');
         blocks.push(block('reportPenTrailsAsCostume'));
         blocks.push('-');
         blocks.push(block('doPasteOn'));
@@ -11862,9 +11903,7 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('reportColor'));
         blocks.push(block('reportColorAttribute'));
         blocks.push(block('reportNewColor'));
-
     } else if (category === 'control') {
-
         blocks.push(block('receiveGo'));
         blocks.push(block('receiveKey'));
         blocks.push(block('receiveInteraction'));
@@ -11874,6 +11913,8 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('doBroadcast'));
         blocks.push(block('doBroadcastAndWait'));
         blocks.push(block('reportPoll'));
+        blocks.push(watcherToggle('getLastMessage'));
+        blocks.push(block('getLastMessage'));
         blocks.push('-');
         blocks.push(block('doWarp'));
         blocks.push('-');
@@ -11885,59 +11926,33 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('doUntil'));
         blocks.push(block('doFor'));
         blocks.push('-');
-        // blocks.push(block('doVariadicIf'));
         blocks.push(block('doIf'));
         blocks.push(block('doIfElse'));
         blocks.push(block('reportIfElse'));
         blocks.push('-');
-        blocks.push(block('doReport'));
         blocks.push(block('doStopThis'));
-        blocks.push('-');
-        blocks.push(block('doRun'));
-        blocks.push(block('fork'));
-        blocks.push(block('evaluate'));
-        blocks.push(block('reportPipe'));
         blocks.push('-');
         blocks.push(block('doTellTo'));
         blocks.push(block('reportAskFor'));
         blocks.push('-');
+        blocks.push(block('receiveOnClone'));
         blocks.push(block('createClone'));
         blocks.push(block('newClone'));
+        blocks.push(block('removeClone'));
         blocks.push('-');
         blocks.push(block('doPauseAll'));
         blocks.push(block('doSwitchToScene'));
         blocks.push('-');
         blocks.push(block('receiveUserEdit'));
-        blocks.push(block('doDefineBlock'));
-        blocks.push(block('doDeleteBlock'));
-        blocks.push(block('doSetBlockAttribute'));
-        blocks.push(block('reportBlockAttribute'));
         blocks.push(block('reportEnvironment'));
-        blocks.push('-');
-        blocks.push(block('receiveSlotEvent'));
-        blocks.push(block('doSetSlot'));
-        blocks.push('-');
-        blocks.push(block('reportNewProcess'));
-        blocks.push(block('reportProcessAttribute'));
-        blocks.push(block('reportProcessState'));
-        blocks.push(block('doChangeProcess'));
-
         // for debugging: ///////////////
         if (this.world()?.isDevMode) {
             blocks.push('-');
             blocks.push(this.devModeText());
             blocks.push('-');
-            blocks.push(watcherToggle('getLastMessage'));
-            blocks.push(block('getLastMessage'));
             blocks.push(block('reportHyperZip'));
-        // deprecated - superseded by reportEnviornment - retained for legacy
-            blocks.push('-');
-            blocks.push(block('doCallCC'));
-            blocks.push(block('reportCallCC'));
         }
-
     } else if (category === 'sensing') {
-
         blocks.push(block('doAsk'));
         blocks.push(watcherToggle('getLastAnswer'));
         blocks.push(block('getLastAnswer'));
@@ -11951,6 +11966,7 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push('-');
         blocks.push(block('reportKeyPressed'));
         blocks.push('-');
+        blocks.push(block('reportRelationTo'));
         blocks.push(block('reportAspect'));
         blocks.push('-');
         blocks.push(block('doResetTimer'));
@@ -11959,11 +11975,9 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('reportDate'));
         blocks.push('-');
         blocks.push(block('reportAttributeOf'));
-
         if (SpriteMorph.prototype.enableFirstClass) {
             blocks.push(block('reportGet'));
         }
-
         blocks.push(block('reportObject'));
         blocks.push('-');
         blocks.push(block('reportURL'));
@@ -11973,7 +11987,6 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push('-');
         blocks.push(block('reportGlobalFlag'));
         blocks.push(block('doSetGlobalFlag'));
-
         // for debugging: ///////////////
         if (this.world()?.isDevMode) {
             blocks.push('-');
@@ -11985,13 +11998,9 @@ StageMorph.prototype.blockTemplates = function (
             blocks.push(block('reportFrameCount'));
             blocks.push(block('reportYieldCount'));
         }
-    }
-    if (category === 'operators') {
-
-        blocks.push(block('reifyScript'));
-        blocks.push(block('reifyReporter'));
-        blocks.push(block('reifyPredicate'));
-        blocks.push('#');
+    } else if (category === 'numbers') {
+        blocks.push(block('toNumber'));
+        blocks.push(block('reportNil'));
         blocks.push('-');
         blocks.push(block('reportVariadicSum'));
         blocks.push(block('reportDifference'));
@@ -12017,25 +12026,15 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('reportNot'));
         blocks.push(block('reportBoolean'));
         blocks.push('-');
-        blocks.push(block('reportJoinWords'));
-        blocks.push(block('reportTextSplit'));
-        blocks.push(block('reportLetter'));
-        blocks.push(block('reportTextAttribute'));
-        blocks.push('-');
-        blocks.push(block('reportUnicode'));
-        blocks.push(block('reportUnicodeAsLetter'));
-        blocks.push('-');
         blocks.push(block('reportIsA'));
         blocks.push(block('reportVariadicIsIdentical'));
-
-        if (Process.prototype.enableJS) { // (Process.prototype.enableJS) {
+        if (Process.prototype.enableJS) {
             blocks.push('-');
             blocks.push(block('reportJSFunction'));
             if (Process.prototype.enableCompiling) {
                 blocks.push(block('reportCompiled'));
             }
         }
-
         // for debugging: ///////////////
         if (this.world()?.isDevMode) {
             blocks.push('-');
@@ -12044,16 +12043,22 @@ StageMorph.prototype.blockTemplates = function (
             blocks.push(block('reportTypeOf'));
             blocks.push(block('reportTextFunction'));
         }
-
-    }
-    if (category === 'variables') {
-
+    } else if (category === 'strings') {
+        blocks.push(block('reportJoinWords'));
+        blocks.push(block('reportTextSplit'));
+        blocks.push(block('reportLetter'));
+        blocks.push(block('reportTextAttribute'));
+        blocks.push('-');
+        blocks.push(block('reportUnicode'));
+        blocks.push(block('reportUnicodeAsLetter'));
+    } else if (category === 'vectors') {
+        blocks.push(block('reportVec2'));
+    } else if (category === 'variables') {
         blocks.push(this.makeVariableButton());
-        if (this.variables.allNames().length > 0) {
+        if (this.deletableVariableNames().length > 0) {
             blocks.push(this.deleteVariableButton());
         }
         blocks.push('-');
-
         varNames = this.allGlobalVariableNames(true, all);
         if (varNames.length > 0) {
             varNames.forEach(name => {
@@ -12062,7 +12067,6 @@ StageMorph.prototype.blockTemplates = function (
             });
             blocks.push('-');
         }
-
         varNames = this.allLocalVariableNames(true, all);
         if (varNames.length > 0) {
             varNames.forEach(name => {
@@ -12071,13 +12075,17 @@ StageMorph.prototype.blockTemplates = function (
             });
             blocks.push('-');
         }
-
         blocks.push(block('doSetVar'));
         blocks.push(block('doChangeVar'));
         blocks.push(block('doShowVar'));
         blocks.push(block('doHideVar'));
         blocks.push(block('doDeclareVariables'));
-        blocks.push('=');
+        // inheritance:
+        if (StageMorph.prototype.enableInheritance) {
+            blocks.push('-');
+            blocks.push(block('doDeleteAttr'));
+        }
+    } else if (category === 'lists') {
         blocks.push(block('reportNewList'));
         blocks.push(block('reportNumbers'));
         blocks.push('-');
@@ -12105,29 +12113,59 @@ StageMorph.prototype.blockTemplates = function (
         blocks.push(block('reportConcatenatedLists'));
         blocks.push(block('reportReshape'));
         blocks.push(block('reportCrossproduct'));
-
-        if (SpriteMorph.prototype.showingExtensions) {
-            blocks.push('=');
-            blocks.push(block('doPrimitive'));
-            blocks.push(block('doApplyExtension'));
-            blocks.push(block('reportApplyExtension'));
-        }
-
-        if (StageMorph.prototype.enableCodeMapping) {
-            blocks.push('=');
-            blocks.push(block('doMapCodeOrHeader'));
-            blocks.push(block('doMapValueCode'));
-            blocks.push(block('doMapListCode'));
-            blocks.push('-');
-            blocks.push(block('reportMappedCode'));
-        }
-
-        // for debugging: ///////////////
+                // for debugging: ///////////////
         if (this.world()?.isDevMode) {
             blocks.push('-');
             blocks.push(this.devModeText());
             blocks.push('-');
             blocks.push(block('doShowTable'));
+        }
+    } else if (category === 'lambda') {
+        blocks.push(block('reifyScript'));
+        blocks.push(block('reifyReporter'));
+        blocks.push(block('reifyPredicate'));
+        blocks.push('#');
+        blocks.push('-');
+        blocks.push(block('doIgnore'));
+        blocks.push(block('doReport'));
+        blocks.push('-');
+        blocks.push(block('doRun'));
+        blocks.push(block('fork'));
+        blocks.push(block('evaluate'));
+        blocks.push(block('reportPipe'));
+        blocks.push('-');
+        blocks.push(block('doDefineBlock'));
+        blocks.push(block('doDeleteBlock'));
+        blocks.push(block('doSetBlockAttribute'));
+        blocks.push(block('reportBlockAttribute'));
+        blocks.push('-');
+        blocks.push(block('receiveSlotEvent'));
+        blocks.push(block('doSetSlot'));
+        blocks.push('-');
+        blocks.push(block('reportNewProcess'));
+        blocks.push(block('reportProcessAttribute'));
+        blocks.push(block('reportProcessState'));
+        blocks.push(block('doChangeProcess'));
+        if (this.world()?.isDevMode) {
+            blocks.push('-');
+            blocks.push(this.devModeText());
+        // deprecated - superseded by reportEnviornment - retained for legacy
+            blocks.push('-');
+            blocks.push(block('doCallCC'));
+            blocks.push(block('reportCallCC'));
+        }
+    } else if (category === 'other') {
+        if (SpriteMorph.prototype.showingExtensions) {
+            blocks.push(block('doPrimitive'));
+            blocks.push(block('doApplyExtension'));
+            blocks.push(block('reportApplyExtension'));
+        }
+        if (StageMorph.prototype.enableCodeMapping) {
+            blocks.push(block('doMapCodeOrHeader'));
+            blocks.push(block('doMapValueCode'));
+            blocks.push(block('doMapListCode'));
+            blocks.push('-');
+            blocks.push(block('reportMappedCode'));
         }
     }
 
@@ -12438,7 +12476,7 @@ StageMorph.prototype.trailsLogAsSVG = function () {
         'width="' + box.width() + '" height="' + box.height() + '" ' +
         // 'style="background-color:black" ' + // for supporting backgrounds
         '>';
-    svg += '<!-- Generated by Snap! - http://snap.berkeley.edu/ -->';
+    svg += '<!-- Generated by Asterisk* - http://snap.berkeley.edu/ -->';
 
     // for debugging the viewBox:
     // svg += '<rect width="100%" height="100%" fill="black"/>'
@@ -14852,7 +14890,7 @@ Note.prototype.setupContext = function () {
 
 Note.prototype.getAudioContext = function () {
     // lazily initializes and shares the Note prototype's audio context
-    // to be used by all other Snap! objects requiring audio,
+    // to be used by all other Asterisk* objects requiring audio,
     // e.g. the microphone, the sprites, etc.
     if (!this.audioContext) {
         this.setupContext();
@@ -15418,11 +15456,21 @@ CellMorph.prototype.dataAsMorph = function (data) {
         contents.bounds.setHeight(img.height);
         contents.cachedImage = img;
         this.version = data.version;
-    } else if (isString(data)) {
-        txt  = data.length > 500 ?
+    } else if (data instanceof Nil) {
+        maxHeight = ide.height() / 2;
+        morphToShow = new TextMorph(
+            'nil',
+            this.fontSize,
+            0,
+            true,
+            true
+        )
+        morphToShow.setColor(new Color(90, 90, 90)) 
+    } else if (typeof data === 'string') {
+        txt = data.length > 500 ?
                 data.slice(0, 500) + '...' : data;
         contents = new TextMorph(
-            txt,
+            `"${txt}"`,
             fontSize,
             null,
             true,
@@ -15433,7 +15481,37 @@ CellMorph.prototype.dataAsMorph = function (data) {
             contents.isEditable = true;
             contents.enableSelecting();
         }
-        contents.setColor(WHITE);
+        contents.setColor(SpriteMorph.prototype.blockColor.strings)
+    } else if (typeof data === 'number') {
+        txt = String(data).length > 500 ?
+                String(data).slice(0, 500) + '...' : String(data);
+        contents = new TextMorph(
+            txt, //EEEEEED
+            fontSize,
+            null,
+            true,
+            true,
+            'left'
+        );
+        if (this.isEditable) {
+            contents.isEditable = true;
+            contents.enableSelecting();
+        }
+        contents.setColor(SpriteMorph.prototype.blockColor.numbers)
+    } else if (data instanceof Point) {
+        contents = new TextMorph(
+            `@ x: ${data.x}\n@ y: ${data.y}`,
+            fontSize,
+            null,
+            true,
+            true,
+            'left'
+        );
+        if (this.isEditable) {
+            contents.isEditable = true;
+            contents.enableSelecting();
+        }
+        contents.setColor(SpriteMorph.prototype.blockColor.vectors)
     } else if (data instanceof Process) {
         contents = data.widget();
     } else if (typeof data === 'boolean') {
@@ -15485,12 +15563,13 @@ CellMorph.prototype.dataAsMorph = function (data) {
         };
     } else if (data instanceof Costume) {
         img = data.thumbnail(new Point(40, 40));
-        contents = new Morph();
+        /*contents = new Morph();
         contents.isCachingImage = true;
         contents.bounds.setWidth(img.width);
         contents.bounds.setHeight(img.height);
-        contents.cachedImage = img;
-
+        contents.cachedImage = img*/
+        
+        contents = new CostumeIconMorph(data)
         // support costumes to be dragged out of watchers:
         contents.isDraggable = draggable;
         contents.selectForEdit = function () {
@@ -15516,8 +15595,9 @@ CellMorph.prototype.dataAsMorph = function (data) {
             icon.setCenter(this.center());
             return icon;
         };
+        
     } else if (data instanceof Sound) {
-        contents = new SymbolMorph('notes', 30);
+        contents = new SoundIconMorph(data)
 
         // support sounds to be dragged out of watchers:
         contents.isDraggable = draggable;
@@ -15547,7 +15627,7 @@ CellMorph.prototype.dataAsMorph = function (data) {
     } else if (data instanceof List) {
         if (data.isADT()) {
             // attempt to render the '_morph' method for a custom view.
-            // since in this situation we don't have a full Snap! process
+            // since in this situation we don't have a full Asterisk* process
             // this will fail in most cases (unless there is a JS extension)
             // as a fallback render a box symbol representing the ADT
             try {
@@ -16333,7 +16413,7 @@ WatcherMorph.prototype.importData = function (raw) {
         function txtOnlyMsg(ftype, anyway) {
             ide.confirm(
                 localize(
-                    'Snap! can only import "text" files. ' +
+                    'Asterisk* can only import "text" files. ' +
                         'You selected a file of type "' +
                         ftype +
                         '".'

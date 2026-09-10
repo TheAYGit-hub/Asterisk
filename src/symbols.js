@@ -2,16 +2,16 @@
 
     symbols.js
 
-    graphical GUI-symbols for for morphic.js and Snap!
+    graphical GUI-symbols for for morphic.js and Asterisk*
 
     written by Jens Mönig
     jens@moenig.org
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -32,7 +32,7 @@
 
     credits:
     --------
-    additional symbols have been contributed by members of the Snap!
+    additional symbols have been contributed by members of the Asterisk*
     open-source community, especially by Bernat Romagosa
 
 */

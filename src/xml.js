@@ -9,9 +9,9 @@
 
     Copyright (C) 2020 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.

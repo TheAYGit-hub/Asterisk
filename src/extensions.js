@@ -2,15 +2,15 @@
 
     extensions.js
 
-    additional primitives for SNAP!
+    additional primitives for Asterisk*
 
     written by Jens Mönig
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -67,7 +67,7 @@ var SnapExtensions = {
     menus in the "menus" section and custom palette push-buttons in the
     "buttons" collection.
 
-    You can also extend Snap! with your own externally hosted JavaScript file(s)
+    You can also extend Asterisk* with your own externally hosted JavaScript file(s)
     and have them add your own extension primitives, menus and buttons to the
     global SnapExtensions dictionaries. This lets you provide libraries to
     support special APIs and custom hardware.
@@ -166,7 +166,7 @@ var SnapExtensions = {
     4. External JavaScript files
     ============================
     You can provide extensions for your custom hardware or for arbitrary APIs
-    or extend Snap! with JavaScript libraries from other parties. You can
+    or extend Asterisk* with JavaScript libraries from other parties. You can
     load additional JavaScript files using the
 
         src_load(url)
@@ -222,7 +222,7 @@ var SnapExtensions = {
     When you're ready to publish your extension you can contact us to allow-list
     the url hosting your JS file, or you can send me a Github pull-request to
     include it in the main Snap branch.
-    We recommend submitting your extensions to the main Snap! Github repository
+    We recommend submitting your extensions to the main Asterisk* Github repository
     so they can be made available in the offline versions (source download
     and PWA).
     External extensions are a powerful tools to change, override and generally
@@ -2289,7 +2289,7 @@ SnapExtensions.primitives.set(
             } else {
                 throw new Error(
                     'unlisted extension url:\n"' + url + '"\n' +
-                    'JavaScript extensions for Snap!\nare turned off'
+                    'JavaScript extensions for Asterisk*\nare turned off'
                 );
             }
         } else if (proc.context.accumulator.done) {

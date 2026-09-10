@@ -2,15 +2,15 @@
 
     locale.js
 
-    spoken language translation for SNAP!
+    spoken language translation for Asterisk*
 
     written by Jens Mönig
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -32,7 +32,7 @@
 
     or to the section titled
 
-        Translating Snap!
+        Translating Asterisk*
 
     in the file
 
@@ -193,7 +193,7 @@ SnapTranslator.dict.en = {
         'This item could not be opened in a new tab.\n' +
         'It has been saved to your browser\'s downloads folder.',
     'unable to export text':
-        'This item could not be exported from Snap!.\n' +
+        'This item could not be exported from Asterisk*.\n' +
         'It\'s likely that your project may contain a lot of media ' +
         '(sounds and images) or that you are using an older browser.' +
         'Please try using a recent version of Chrome, Firefox, or Safari.'

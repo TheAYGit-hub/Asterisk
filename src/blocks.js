@@ -11,9 +11,9 @@
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -2694,10 +2694,6 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
             ide.showMessage(error.message, 2, true);
         }
     }
-
-    if ((value === undefined) || !wrrld) {
-        return null;
-    }
     if (value instanceof ListWatcherMorph) {
         morphToShow = value;
         morphToShow.update(true);
@@ -2827,12 +2823,13 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
     } else if (value instanceof Costume) {
         img = value.thumbnail(new Point(40, 40));
         morphToShow = new Morph();
-        morphToShow = new Morph();
+        /*morphToShow = new Morph();
         morphToShow.isCachingImage = true;
         morphToShow.bounds.setWidth(img.width);
         morphToShow.bounds.setHeight(img.height);
-        morphToShow.cachedImage = img;
-
+        morphToShow.cachedImage = img;*/
+        
+        morphToShow = new CostumeIconMorph(value)
         // support costumes to be dragged out of result bubbles:
         morphToShow.isDraggable = !SpriteMorph.prototype.disableDraggingData;
 
@@ -2879,7 +2876,7 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
         };
 
     } else if (value instanceof Sound) {
-        morphToShow = new SymbolMorph('notes', 30);
+        morphToShow = new SoundIconMorph(value);
 
         // support sounds to be dragged out of result bubbles:
         morphToShow.isDraggable = !SpriteMorph.prototype.disableDraggingData;
@@ -2961,16 +2958,28 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
             value,
             this.fontSize * 1.4
         );
-    } else if (isString(value)) {
-        // shorten the string, commented out because we now scroll it
-        // txt  = value.length > 500 ? value.slice(0, 500) + '...' : value;
-        txt  = value;
+    } else if (value instanceof Nil) {
         maxHeight = ide.height() / 2;
         morphToShow = new TextMorph(
-            txt,
-            this.fontSize
+            'nil',
+            this.fontSize,
+            0,
+            true,
+            true
+        )
+        morphToShow.setColor(new Color(90, 90, 90)) 
+    } else if (typeof value == 'string') {
+        // shorten the string, commented out because we now scroll it
+        // txt  = value.length > 500 ? value.slice(0, 500) + '...' : value;
+        maxHeight = ide.height() / 2;
+        morphToShow = new TextMorph(
+            `"${value}"`,
+            this.fontSize,
+            0,
+            false
         );
-
+        
+        morphToShow.color = SpriteMorph.prototype.blockColor.strings;
         if (morphToShow.height() > maxHeight) { // scroll
             scroller = new ScrollFrameMorph();
             scroller.acceptsDrops = false;
@@ -2981,6 +2990,75 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
             scroller.color = new Color(0, 0, 0, 0);
             morphToShow = scroller;
         }
+        
+        // support exporting text / numbers directly from result bubbles:
+        morphToShow.userMenu = function () {
+            var menu = new MenuMorph(this);
+            menu.addItem(
+                'export',
+                () => ide.saveFileAs(
+                    value,
+                    'text/plain;charset=utf-8',
+                    localize('data')
+                )
+            );
+            menu.addItem(
+                'copy',
+                () => writeClipboardText(value, ide)
+            );
+            return menu;
+        };
+    } else if (typeof value == 'number') {
+        // shorten the string, commented out because we now scroll it
+        // txt  = value.length > 500 ? value.slice(0, 500) + '...' : value;
+        maxHeight = ide.height() / 2;
+        morphToShow = new TextMorph(
+            `${value}`,
+            this.fontSize,
+            0,
+            false,
+            true
+        );
+        
+        morphToShow.color = SpriteMorph.prototype.blockColor.numbers;
+        if (morphToShow.height() > maxHeight) { // scroll
+            scroller = new ScrollFrameMorph();
+            scroller.acceptsDrops = false;
+            scroller.contents.acceptsDrops = false;
+            scroller.bounds.setWidth(morphToShow.width());
+            scroller.bounds.setHeight(maxHeight);
+            scroller.addContents(morphToShow);
+            scroller.color = new Color(0, 0, 0, 0);
+            morphToShow = scroller;
+        }
+        
+        // support exporting text / numbers directly from result bubbles:
+        morphToShow.userMenu = function () {
+            var menu = new MenuMorph(this);
+            menu.addItem(
+                'export',
+                () => ide.saveFileAs(
+                    value,
+                    'text/plain;charset=utf-8',
+                    localize('data')
+                )
+            );
+            menu.addItem(
+                'copy',
+                () => writeClipboardText(value, ide)
+            );
+            return menu;
+        };
+    } else if (value instanceof Point) {
+        morphToShow = new TextMorph(
+            `@ x: ${value.x}\n@ y: ${value.y}`,
+            this.fontSize,
+            0,
+            true,
+            true
+        );
+
+        morphToShow.color = SpriteMorph.prototype.blockColor.vectors;
         
         // support exporting text / numbers directly from result bubbles:
         morphToShow.userMenu = function () {
@@ -3887,7 +3965,7 @@ BlockMorph.prototype.userMenu = function () {
             'compile',
             () => this.setSelector(compiledAlternatives[this.selector]),
             'experimental!\nmake this reporter fast and uninterruptable\n' +
-                'CAUTION: Errors in the ring\ncan break your Snap! session!'
+                'CAUTION: Errors in the ring\ncan break your Asterisk* session!'
         );
     } else if (
         contains(
@@ -11877,7 +11955,7 @@ InputSlotMorph.prototype.menuFromDict = function (
 
     if (choices instanceof Function) {
         if (!Process.prototype.enableJS) {
-            menu.addItem('JavaScript extensions for Snap!\nare turned off');
+            menu.addItem('JavaScript extensions for Asterisk*\nare turned off');
             return menu;
         }
         choices = choices.call(this);
@@ -12575,9 +12653,9 @@ InputSlotMorph.prototype.userEditMenu = function (searching) {
 
 InputSlotMorph.prototype.typesMenu = function () {
     var dict = {
-        number : ['number'],
         text : ['text'],
-        Boolean : ['Boolean'],
+        number : ['number'],
+        boolean : ['boolean'],
         list : ['list']
     };
     if (SpriteMorph.prototype.enableFirstClass) {
@@ -12592,6 +12670,8 @@ InputSlotMorph.prototype.typesMenu = function () {
     dict.predicate = ['predicate'];
     dict.hat = ['hat'];
     dict.process = ['process'];
+    dict.nil = ['nil'],
+    
     dict['~'] = null;
     // the following entries are collective types and thus not unique:
     if (SpriteMorph.prototype.enableFirstClass) {
@@ -16501,7 +16581,7 @@ ReporterSlotMorph.prototype.fixLayout = function () {
 
 /*
     I am a ReporterBlock-shaped input slot for use in RingMorphs.
-    I can nest reporter blocks (both round and diamond) as well
+    I can nest reporter blocks (both roundand diamond) as well
     as command blocks (jigsaw shaped).
 
     My command spec is %rr for reporters (round) and %rp for

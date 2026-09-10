@@ -41,5 +41,5 @@ SnapTranslator.dict.en_BR = { ...SnapTranslator.dict.en_BR,
     "costumes tab help": "import a picture from another web page or from\na file on your computer by dropping it here\n",
     "block deletion dialog text": "Are you sure you want to delete this\ncustom block and all its instances?",
     "download to disk text": "This item could not be opened in a new tab.\nIt has been saved to your browser\'s downloads folder.",
-    "unable to export text": "This item could not be exported from Snap!.\nIt\'s likely that your project may contain a lot of media (sounds and images) or that you are using an older browser. Please try using a recent version of Chrome, Firefox, or Safari."
+    "unable to export text": "This item could not be exported from Asterisk*.\nIt\'s likely that your project may contain a lot of media (sounds and images) or that you are using an older browser. Please try using a recent version of Chrome, Firefox, or Safari."
 };

@@ -1,15 +1,15 @@
 /*
     paint.js
 
-    a paint editor for Snap!
+    a paint editor for Asterisk*
     inspired by the Scratch paint editor.
 
     written by Kartik Chandra
     Copyright (C) 2019 by Kartik Chandra
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.

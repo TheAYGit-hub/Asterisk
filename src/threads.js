@@ -11,9 +11,9 @@
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -203,7 +203,7 @@ function invoke(
             throw (new Error(
                 localize(
                     timeoutErrorMsg ||
-                        "a synchronous Snap! script has timed out")
+                        "a synchronous Asterisk* script has timed out")
                 )
             );
         }
@@ -703,6 +703,7 @@ Process.prototype.isRunning = function () {
     return !this.readyToTerminate && (this.context || this.isPaused);
 };
 
+
 // Process entry points
 
 Process.prototype.runStep = function (deadline) {
@@ -954,7 +955,7 @@ Process.prototype.evaluateContext = function () {
 
     // keep track of overall frames for profiling purposes.
     // also keep track of frames inside the current atomic step.
-    // In order to let Snap! behave similarly on a wide range of
+    // In order to let Asterisk* behave similarly on a wide range of
     // differently performant hardware decide when to yield inside
     // a WARPed script or an infinitely recursive reporter
     // by how much time has elapsed since the last yield, but since
@@ -1072,6 +1073,13 @@ Process.prototype.reportApplyExtension = function (prim, args) {
 
 // Process: Special Forms Blocks Primitives
 
+Process.prototype.reportVariadicAnd = function (block) {
+    this.reportAssociativeBool(
+        block,
+        this.reportBasicAnd, // base op
+        false // short-circuit return value
+    );
+};
 Process.prototype.reportVariadicOr = function (block) {
     this.reportAssociativeBool(
         block,
@@ -1080,18 +1088,10 @@ Process.prototype.reportVariadicOr = function (block) {
     );
 };
 
-Process.prototype.reportVariadicAnd = function (block) {
-    this.reportAssociativeBool(
-        block,
-        this.reportBasicAnd, // base op
-        false // short-circuit return value
-    );
-};
-
 Process.prototype.reportAssociativeBool = function (block, baseOp, short) {
     // private - evaluate special form variadic associative Boolean operations
-    // such as AND, OR
-    // baseOp - dyadic base operation (AND, OR)
+    // such as AND, OR, XOR
+    // baseOp - dyadic base operation (AND, OR, XOR)
     // short - value at which to immediately return (short circuit)
     var inputs = this.context.inputs,
         tests = block.inputs()[0],
@@ -1167,7 +1167,6 @@ Process.prototype.reportBasicOr = function (a, b) {
 Process.prototype.reportBasicAnd = function (a, b) {
     return a && b;
 };
-
 Process.prototype.doReport = function (block) {
     var outer = this.context.outerContext;
     if (this.flashContext()) {return; } // flash the block here, special form
@@ -1200,6 +1199,10 @@ Process.prototype.doReport = function (block) {
     // an HTTP Request for a hardware extension
     this.pushContext(block.inputs()[0], outer);
     this.context.isCustomCommand = block.partOfCustomCommand;
+};
+
+Process.prototype.doIgnore = function (block) {
+    return block
 };
 
 // Process: Non-Block evaluation
@@ -1621,7 +1624,7 @@ Process.prototype.reifyPredicate = function (topBlock, parameterNames) {
 
 Process.prototype.reportJSFunction = function (parmNames, body) {
     if (!this.enableJS) {
-        throw new Error('JavaScript extensions for Snap!\nare turned off');
+        throw new Error('JavaScript extensions for Asterisk*\nare turned off');
     }
     return Function.apply(
         null,
@@ -5103,11 +5106,14 @@ Process.prototype.assertAlive = function (thing) {
 Process.prototype.reportTypeOf = function (thing) {
     // answer a string denoting the argument's type
     var exp;
-    if (thing === null || (thing === undefined)) {
-        return 'nothing';
+    if (typeof thing === undefined) {
+        return 'pending';
+    }
+    if (thing instanceof Nil) {
+        return 'nil';
     }
     if (thing === true || (thing === false)) {
-        return 'Boolean';
+        return 'boolean';
     }
     if (thing instanceof List) {
         return 'list';
@@ -5178,9 +5184,12 @@ Process.prototype.reportTypeOf = function (thing) {
     if (thing instanceof Array && isString(thing[0])) {
         return 'selector';
     }
-    return 'undefined';
+    return 'unknown';
 };
 
+Process.prototype.reportNil = function() {
+    return new Nil()
+}
 // Process math primtives - hyper
 
 Process.prototype.hyper = function (fn, ...args) {
@@ -5598,6 +5607,7 @@ Process.prototype.reportNot = function (bool) {
 
 Process.prototype.reportIsIdentical = function (a, b) {
     var tag = 'idTag';
+    if (typeof a !== typeof b) return false
     if (isString(a) && isString(b)) {
         // compare texts case-sentitive
         return a === b;
@@ -6056,7 +6066,7 @@ Process.prototype.rawParseCSV = function (text, delim) {
         records.pop();
     }
 
-    // convert arrays to Snap! Lists
+    // convert arrays to Asterisk* Lists
     records = new List(
         records.map(row => new List(row))
     );
@@ -6324,7 +6334,7 @@ Process.prototype.alert = function (data) {
     if (this.homeContext.receiver) {
         world = this.homeContext.receiver.world();
         if (world.isDevMode) {
-            alert('Snap! ' + data.itemsArray());
+            alert('Asterisk* ' + data.itemsArray());
         }
     }
 };
@@ -6335,7 +6345,7 @@ Process.prototype.log = function (data) {
     if (this.homeContext.receiver) {
         world = this.homeContext.receiver.world();
         if (world.isDevMode) {
-            console.log('Snap! ' + data.itemsArray());
+            console.log('Asterisk* ' + data.itemsArray());
         }
     }
 };
@@ -9322,7 +9332,7 @@ Process.prototype.slotSpec = function (num) {
         ].includes(spec) && num > 100)
     {
         // guard against unimaginative metaprogramming fetishist assholes
-        // badmouthing Snap! "bugs" in the forums
+        // badmouthing Asterisk* "bugs" in the forums
         return null;
     }
     return prefix + '%' + spec;
@@ -10318,6 +10328,14 @@ Process.prototype.reportDigitalReading = function (pin, booleanValue) {
     );
 };
 
+/* Asterisk* mod custom blocks  */
+Process.prototype.toNumber = function (name) {
+    return +name
+};
+
+Process.prototype.reportVec2 = function (x, y) {
+    return new Point(x, y)
+};
 // Context /////////////////////////////////////////////////////////////
 
 /*

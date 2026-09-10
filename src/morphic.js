@@ -10,9 +10,9 @@
 
     Copyright (C) 2010-2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -1014,7 +1014,7 @@
     continuously perform collision detection. However, it will also consume
     more memory. Therefore it's best to use this setting with caution.
     
-    Snap! caches the shapes of sprites but not those of blocks. Instead it
+    Asterisk* caches the shapes of sprites but not those of blocks. Instead it
     manages the insides of C- and E-shaped blocks through the morphic "holes"
     mechanism.
 
@@ -1199,7 +1199,7 @@
     safe to call directly. For an example how to make retina support
     user-specifiable refer to
 
-        Snap! >> guis.js >> toggleRetina()
+        Asterisk* >> guis.js >> toggleRetina()
 
     Even when in retina mode it often makes sense to use normal-resolution
     canvasses for simple shapes in order to save system resources and
@@ -1458,7 +1458,7 @@ var MorphicPreferences = standardSettings;
     or already disabled, so it's equally safe to call.
 
     For an example how to make retina support user-specifiable refer to
-    Snap! >> guis.js >> toggleRetina()
+    Asterisk* >> guis.js >> toggleRetina()
 */
 
 enableRetinaSupport();
@@ -1685,7 +1685,7 @@ function embedMetadataPNG(aCanvas, aString) {
         parts = aCanvas.toDataURL("image/png").split(","),
         bPart = atob(parts[1]).split(""),
         newChunk = buildChunk(
-            "Snap!_SRC\0\0\0\0\0" +
+            "Asterisk*_SRC\0\0\0\0\0" +
             embedTag +
             encodeURIComponent(aString) +
             embedTag
@@ -1755,7 +1755,7 @@ function enableRetinaSupport() {
     written to the Canvas element will be scaled appropriately.
 
     NOTE: This implementation is not exhaustive; it only implements what is
-    needed by the Snap! UI.
+    needed by the Asterisk* UI.
 
     [Jens]: like all other retina screen support implementations I've seen
     Bartosz's patch also does not address putImageData() compatibility when
@@ -5741,7 +5741,7 @@ CursorMorph.prototype.init = function (aStringOrTextMorph, aTextarea) {
  /*
      There are three cases when the textarea gets inputs:
 
-     1. Inputs that represent special shortcuts of Snap!, so we
+     1. Inputs that represent special shortcuts of Asterisk*, so we
      don't want the textarea to handle it. These events are captured in
      "keydown" event handler.
 

@@ -2,16 +2,16 @@
 
     api.js
 
-    programmatically interact with a Snap! project
+    programmatically interact with a Asterisk* project
 
     written by Jens Mönig
     jens@moenig.org
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -32,7 +32,7 @@
 
     documentation
     -------------
-    along with this file you should have received a copy of the Snap! API
+    along with this file you should have received a copy of the Asterisk* API
     documentation. If not, see
     https://github.com/jmoenig/Snap/blob/master/API.md
     or https://snap.berkeley.edu/snap/API.md
@@ -50,8 +50,8 @@ modules.api = '2026-August-09';
 
 // IDE_Morph external communication API
 /*
-    programmatically trigger scripts from outside of Snap!
-    add message listeners to Snap! broadcasts and access
+    programmatically trigger scripts from outside of Asterisk*
+    add message listeners to Asterisk* broadcasts and access
     global variables
 */
 
@@ -338,7 +338,7 @@ IDE_Morph.prototype.showScriptBalloonAt = function (contents, charIdx, name) {
     // indicated by name or the current sprite or stage if none that corresponds
     // to the index of the text given the current codification mapping, and
     // display the given contents, which can be a string, number, costume,
-    // morph, canvas, list, table etc. (anything first-class in Snap!)
+    // morph, canvas, list, table etc. (anything first-class in Asterisk*)
     var scripts = this.spriteNamed(name).scripts;
     // scripts.unflash();
     // scripts.flashCodeIdx(charIdx, contents);

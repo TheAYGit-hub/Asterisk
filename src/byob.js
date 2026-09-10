@@ -2,7 +2,7 @@
 
     byob.js
 
-    "build your own blocks" for Snap!
+    "build your own blocks" for Asterisk*
     based on morphic.js, widgets.js blocks.js, threads.js and objects.js
     inspired by Scratch
 
@@ -11,9 +11,9 @@
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -3998,8 +3998,8 @@ PrototypeHatBlockMorph.prototype.init = function (definition) {
     HatBlockMorph.uber.init.call(this);
     this.reports = definition ? definition.reports : null;
     this.enforceTypes = definition ? definition.enforceTypes : false;
-    this.color = SpriteMorph.prototype.blockColor.control;
-    this.category = 'control';
+    this.color = SpriteMorph.prototype.blockColor.lambda;
+    this.category = 'lambda';
     this.add(proto);
     if (definition.variableNames.length) {
         vars = this.labelPart('%blockVars');

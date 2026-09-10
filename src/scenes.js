@@ -2,16 +2,16 @@
 
     scenes.js
 
-    multi-scene support for Snap!
+    multi-scene support for Asterisk*
 
     written by Jens Mönig
     jens@moenig.org
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -58,7 +58,7 @@ modules.scenes = '2026-May-19';
 
 // Projecct /////////////////////////////////////////////////////////
 
-// I am a container for a set of one or more Snap! scenes,
+// I am a container for a set of one or more Asterisk* scenes,
 // the IDE operates on an instance of me
 
 // Project instance creation:
@@ -108,7 +108,7 @@ Project.prototype.addDefaultScene = function () {
 
 // Scene /////////////////////////////////////////////////////////
 
-// I am a container for a Snap! stage, scene-global variables
+// I am a container for a Asterisk* stage, scene-global variables
 // and its associated settings.
 // I can be used as a slide in a presentation, a chapter in a narrative,
 // a level in a game, etc.

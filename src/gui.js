@@ -11,9 +11,9 @@
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -57,7 +57,7 @@
     credits
     -------
     Nathan Dinsmore contributed saving and loading of projects,
-    ypr-Snap! project conversion and countless bugfixes
+    ypr-Asterisk* project conversion and countless bugfixes
     Ian Reynolds contributed handling and visualization of sounds
     Michael Ball contributed the LibraryImportDialogMorph and countless
     utilities to load libraries from relative urls
@@ -91,7 +91,7 @@ modules.gui = '2026-September-02';
 
 // Declarations
 
-var SnapVersion = '12.1.0';
+var SnapVersion = '0.0.0';
 
 var IDE_Morph;
 var ProjectDialogMorph;
@@ -288,7 +288,7 @@ function IDE_Morph(config = {}) {
         noExitWarning:  bool, do not show a browser warning when closing the IDE
                                 with unsaved changes
         preserveTitle:  bool, do not set the tab title dynamically to reflect
-                                the current Snap! version
+                                the current Asterisk* version
         zoom:           num, global zoom factor, e.g. 1.25
         blocksZoom:     num, zoom factor for blocks, e.g. 1.5
         blocksFade:     num, fading percentage for blocks, e.g. 85
@@ -544,7 +544,7 @@ IDE_Morph.prototype.openIn = function (world) {
     this.cloudMsg = getURL('https://snap.berkeley.edu/cloudmsg.txt');
     motd = getURL('https://snap.berkeley.edu/motd.txt');
     if (motd) {
-        this.inform('Snap!', motd);
+        this.inform('Asterisk*', motd);
     }
     */
 
@@ -1080,8 +1080,9 @@ IDE_Morph.prototype.createLogo = function () {
                 this.width(),
                 0
             );
-        gradient.addColorStop(0, 'black');
-        gradient.addColorStop(0.5, myself.frameColor.toString());
+        gradient.addColorStop(0, '#522e99');
+        gradient.addColorStop(0.5, '#522e99');
+        gradient.addColorStop(0.6, myself.frameColor.toString());
         ctx.fillStyle = MorphicPreferences.isFlat ||
                 IDE_Morph.prototype.isBright ?
             myself.frameColor.toString() : gradient;
@@ -1485,7 +1486,7 @@ IDE_Morph.prototype.createControlBar = function () {
     button.refresh();
     cloudButton = button;
     this.controlBar.add(cloudButton);
-    this.controlBar.cloudButton = cloudButton; // for menu positioning & refresh
+    this.controlBar.cloudButton = cloudButton;
 
     this.controlBar.fixLayout = function () {
         x = this.right() - padding;
@@ -1610,7 +1611,7 @@ IDE_Morph.prototype.createControlBar = function () {
                 ' (' + myself.scene.name + ')' : '';
         name = (myself.getProjectName() || localize('untitled'));
         if (!myself.config.preserveTitle) {
-            document.title = "Snap! " +
+            document.title = "Asterisk* " +
                 (myself.getProjectName() ? name : SnapVersion);
         }
         txt = new StringMorph(
@@ -1885,9 +1886,7 @@ IDE_Morph.prototype.primitiveCategories = function () {
     // etc. but if the "hideEmptyCategories" setting is active only categories
     // that are populated with at least one block in at least one agent (sprite
     // or stage) in the current scene are answered
-    var categories = SpriteMorph.prototype.categories.filter(cat =>
-        !contains(['lists', 'other'], cat)),
-        all;
+    var categories = SpriteMorph.prototype.categories, all;
     if (!this.scene.hideEmptyCategories) {
         return categories;
     }
@@ -3148,7 +3147,7 @@ IDE_Morph.prototype.droppedImage = function (aCanvas, name, embeddedData, src) {
             'Unable to import this image',
             'The picture you wish to import has been\n' +
                 'tainted by a restrictive cross-origin policy\n' +
-                'making it unusable for costumes in Snap!. \n\n' +
+                'making it unusable for costumes in Asterisk*. \n\n' +
                 'Try downloading this picture first to your\n' +
                 'computer, and import it from there.'
         );
@@ -3369,7 +3368,7 @@ IDE_Morph.prototype.droppedText = function (aString, name, fileType) {
 IDE_Morph.prototype.droppedBinary = function (anArrayBuffer, name) {
     if (this.config.noImports) {return; }
 
-    // dynamically load ypr->Snap!
+    // dynamically load ypr->Asterisk*
     var ypr = document.getElementById('ypr'),
         myself = this,
         suffix = name.substring(name.length - 3);
@@ -3482,7 +3481,7 @@ IDE_Morph.prototype.topVisibleCategoryInPalette = function () {
                 return 'control';
             }
             if (top instanceof RingMorph) {
-                return 'operators';
+                return 'numbers';
             }
             return 'variables';
         }
@@ -4432,7 +4431,7 @@ IDE_Morph.prototype.snapMenu = function () {
         }
     );
     menu.addItem(
-        'Snap! website',
+        'Asterisk* website',
         () => window.open('https://snap.berkeley.edu/', 'SnapWebsite')
     );
     menu.addItem(
@@ -4758,7 +4757,7 @@ IDE_Morph.prototype.settingsMenu = function () {
                 // show JS-func primitive in case a microworld hides it
                 delete StageMorph.prototype.hiddenPrimitives.reportJSFunction;
             }
-            this.flushBlocksCache('operators');
+            this.flushBlocksCache('numbers');
             this.refreshPalette();
             this.refreshEmptyCategories();
         },
@@ -5038,7 +5037,7 @@ IDE_Morph.prototype.settingsMenu = function () {
         () => {
             Process.prototype.enableCompiling =
                 !Process.prototype.enableCompiling;
-            this.flushBlocksCache('operators');
+            this.flushBlocksCache('numbers');
             this.refreshPalette();
             this.refreshEmptyCategories();
         },
@@ -5081,8 +5080,8 @@ IDE_Morph.prototype.projectMenu = function () {
     if (!this.config.noProjectItems) {
         // Setting noProjectItems removes a bunch of things from the project
         // menu. This flag enables a more selective disabling of just the menu
-        // items that deal with the Snap! storage system. This is useful for
-        // embedding Snap! in a site that manages saving and loading the
+        // items that deal with the Asterisk* storage system. This is useful for
+        // embedding Asterisk* in a site that manages saving and loading the
         // project.xml itself.
         if (!this.config.noStorageItems) {
             menu.addPair('New', 'createNewProject', '^N');
@@ -5345,11 +5344,11 @@ IDE_Morph.prototype.projectMenu = function () {
 IDE_Morph.prototype.resourceURL = function () {
     // Take in variadic inputs that represent an a nested folder structure.
     // Method can be easily overridden if running in a custom location.
-    // Default Snap! simply returns a path (relative to snap.html)
+    // Default Asterisk* simply returns a path (relative to snap.html)
     // Note: You can specify a base path to the root directory in the
     // configuration object's "path" property that's passed when creating
     // an IDE instance, e.g. either a relative one: {path: '../' }
-    // or a full url, depending on where (your) Snap! distro ist hosted
+    // or a full url, depending on where (your) Asterisk* distro ist hosted
     var args = Array.prototype.slice.call(arguments, 0),
         path = this.config.path ? [this.config.path] : [];
     return path.concat(args).join('/');
@@ -5398,7 +5397,7 @@ IDE_Morph.prototype.parseResourceFile = function (text) {
     Categories are not expected to be translated with each individual resource, instead
     translations are expected to be provided in each langauge's translation file.
 
-    -- May 2024: categories, and searchData are not used in Snap! yet
+    -- May 2024: categories, and searchData are not used in Asterisk* yet
     Categories: Used to group resources in the media/libraries viewers
     SearchData: Used to augment search results in the viewer, but not be displayed
    */
@@ -5745,22 +5744,12 @@ IDE_Morph.prototype.aboutSnap = function () {
         module, btn1, btn2, btn3, btn4, licenseBtn, translatorsBtn,
         world = this.world();
 
-    aboutTxt = 'Snap! ' + SnapVersion + '\nBuild Your Own Blocks\n\n'
-        + 'Copyright \u24B8 2008-2026 Jens M\u00F6nig and '
-        + 'Brian Harvey\n'
-        + 'jens@moenig.org, bh@cs.berkeley.edu\n\n'
-        + '        Snap! is developed by the University of California, '
-        + 'Berkeley and SAP        \n'
-        + 'with support from the National Science Foundation (NSF),\n'
-        + 'MIOsoft and YC Research.\n'
-        + 'The design of Snap! is influenced and inspired by Scratch,\n'
-        + 'from the Lifelong Kindergarten group at the MIT Media Lab\n\n'
-
-        + 'for more information see https://snap.berkeley.edu';
+    aboutTxt = 'Asterisk* ' + SnapVersion + '\nBuild Your Own Blocks\n\n'
+        + 'some cool mod i made'
 
     noticeTxt = localize('License')
         + '\n\n'
-        + 'Snap! is free software: you can redistribute it and/or modify\n'
+        + 'Asterisk* is free software: you can redistribute it and/or modify\n'
         + 'it under the terms of the GNU Affero General Public License as\n'
         + 'published by the Free Software Foundation, either version 3 of\n'
         + 'the License, or (at your option) any later version.\n\n'
@@ -5774,7 +5763,7 @@ IDE_Morph.prototype.aboutSnap = function () {
         + 'GNU Affero General Public License along with this program.\n'
         + 'If not, see http://www.gnu.org/licenses/\n\n'
 
-        + 'Want to use Snap! but scared by the open-source license?\n'
+        + 'Want to use Asterisk* but scared by the open-source license?\n'
         + 'Get in touch with us, we\'ll make it work.';
 
     creditsTxt = localize('Contributors')
@@ -5796,7 +5785,7 @@ IDE_Morph.prototype.aboutSnap = function () {
         + '\n"Ava" Yuan Yuan, Deborah Servilla: Graphic Effects'
         + '\nKyle Hotchkiss: Block search design'
         + '\nBrian Broll: Many bugfixes and optimizations'
-        + '\nEckart Modrow: SciSnap! Extension'
+        + '\nEckart Modrow: SciAsterisk* Extension'
         + '\nBambi Brewer: Birdbrain Robotics Extension Support'
         + '\nGlen Bull & team: TuneScope Music Extension'
         + '\nIan Reynolds: UI Design, Event Bindings, '
@@ -5819,7 +5808,7 @@ IDE_Morph.prototype.aboutSnap = function () {
         + 'Jahrd, Derec, Jamet, Sarron, Aleassa, and Lirin costumes '
         + 'are watercolor\n paintings by Meghan Taylor and represent '
         + 'characters from her webcomic\nProphecy of the Circle, '
-        + 'licensed to us only for use in Snap! projects. '
+        + 'licensed to us only for use in Asterisk* projects. '
         + '\nMeghan also painted the Tad costumes, '
         + 'which are in the public domain.';
 
@@ -5867,7 +5856,7 @@ IDE_Morph.prototype.aboutSnap = function () {
         return tm;
     }
 
-    dlg.inform('About Snap', aboutTxt, world, this.logo.cachedTexture);
+    dlg.inform('About Asterisk', aboutTxt, world, this.logo.cachedTexture);
     btn1 = dlg.buttons.children[0];
     translatorsBtn = dlg.addButton(
         () => {
@@ -6210,7 +6199,7 @@ IDE_Morph.prototype.deletePaletteCategory = function (name) {
 
 IDE_Morph.prototype.save = function () {
     // temporary hack - only allow exporting projects to disk
-    // when running Snap! locally without a web server
+    // when running Asterisk* locally without a web server
     var pn = this.getProjectName();
     if (location.protocol === 'file:') {
         if (pn) {
@@ -7348,7 +7337,7 @@ IDE_Morph.prototype.autoLoadExtensions = function (optionalScene) {
         } else {
             // throw new Error(
                 'unlisted extension url:\n"' + url + '"\n' +
-                'JavaScript extensions for Snap!\nare turned off'
+                'JavaScript extensions for Asterisk*\nare turned off'
             );
         */
         }
@@ -7972,7 +7961,7 @@ IDE_Morph.prototype.addScene = function () {
         // bypass the project import dialog and directly pop up
         // the local file picker.
         // this should not be necessary, we should be able
-        // to access the cloud even when running Snap! locally
+        // to access the cloud even when running Asterisk* locally
         // to be worked on.... (jens)
         this.isAddingScenes = true;
         this.importLocalFile();
@@ -7987,7 +7976,7 @@ IDE_Morph.prototype.openProjectsBrowser = function () {
         // bypass the project import dialog and directly pop up
         // the local file picker.
         // this should not be necessary, we should be able
-        // to access the cloud even when running Snap! locally
+        // to access the cloud even when running Asterisk* locally
         // to be worked on.... (jens)
         this.importLocalFile();
         return;
@@ -7997,7 +7986,7 @@ IDE_Morph.prototype.openProjectsBrowser = function () {
 
 IDE_Morph.prototype.saveProjectsBrowser = function () {
     // temporary hack - only allow exporting projects to disk
-    // when running Snap! locally without a web server
+    // when running Asterisk* locally without a web server
     if (location.protocol === 'file:') {
         this.prompt(
             'Export Project As...',
@@ -9622,7 +9611,7 @@ IDE_Morph.prototype.verifyProject = function (body) {
     var encodedBody = JSON.stringify(body);
     if (encodedBody.length > Cloud.MAX_FILE_SIZE) {
         new DialogBoxMorph().inform(
-            'Snap!Cloud - Cannot Save Project',
+            'Asterisk*Cloud - Cannot Save Project',
             'The media inside this project exceeds 10 MB.\n' +
                 'Please reduce the size of costumes or sounds.\n',
             this.world(),
@@ -9797,7 +9786,7 @@ IDE_Morph.prototype.cloudResponse = function () {
             response = response.substring(0, 50) + '...';
         }
         new DialogBoxMorph().inform(
-            'Snap!Cloud',
+            'Asterisk*Cloud',
             'http://'
                 + url + ':\n\n'
                 + 'responds:\n'
@@ -9825,7 +9814,7 @@ IDE_Morph.prototype.cloudError = function () {
             return;
         }
         new DialogBoxMorph().inform(
-            'Snap!Cloud',
+            'Asterisk*Cloud',
             (url ? url + '\n' : '')
                 + response,
             this.world(),
@@ -10042,7 +10031,7 @@ IDE_Morph.prototype.warnAboutIE = function () {
         dlg = new DialogBoxMorph();
         txt = new TextMorph(
             'Please do not use Internet Explorer.\n' +
-                'Snap! runs best in a web-standards\n' +
+                'Asterisk* runs best in a web-standards\n' +
                 'compliant browser',
             dlg.fontSize,
             dlg.fontStyle,
@@ -10078,13 +10067,13 @@ IDE_Morph.prototype.warnAboutDev = function () {
     }
     this.inform(
         "CAUTION! Development Version",
-        'This version of Snap! is being developed.\n' +
+        'This version of Asterisk* is being developed.\n' +
             '*** It is NOT supported for end users. ***\n' +
             'Saving a project in THIS version is likely to\n' +
             'make it UNUSABLE or DEFECTIVE for current and\n' +
             'even future official versions!\n\n' +
             'visit https://snap.berkeley.edu/run\n' +
-            'for the official Snap! installation.'
+            'for the official Asterisk* installation.'
     ).nag = true;
 };
 
@@ -14363,7 +14352,7 @@ CamSnapshotDialogMorph.prototype.enabled = true;
 CamSnapshotDialogMorph.prototype.notSupportedMessage =
 	'Please make sure your web browser is up to date\n' +
 	'and your camera is properly configured. \n\n' +
-	'Some browsers also require you to access Snap!\n' +
+	'Some browsers also require you to access Asterisk*\n' +
 	'through HTTPS to use the camera.\n\n' +
     'Please replace the "http://" part of the address\n' +
     'in your browser by "https://" and try again.';
@@ -14735,3 +14724,4 @@ SoundRecorderDialogMorph.prototype.destroy = function () {
     }
     SoundRecorderDialogMorph.uber.destroy.call(this);
 };
+

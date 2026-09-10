@@ -2,16 +2,16 @@
 
     lists.js
 
-    list data structure and GUI for SNAP!
+    list data structure and GUI for Asterisk*
 
     written by Jens Mönig and Brian Harvey
     jens@moenig.org, bh@cs.berkeley.edu
 
     Copyright (C) 2026 by Jens Mönig and Brian Harvey
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -73,7 +73,7 @@ var ListWatcherMorph;
 // List ////////////////////////////////////////////////////////////////
 
 /*
-    I am a dynamic array data structure for SNAP!
+    I am a dynamic array data structure for Asterisk*
     My index starts with 1
 
     I am a "smart" hybrid list, because I can be used as both a linked

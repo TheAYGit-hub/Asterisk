@@ -2,16 +2,16 @@
 
     store.js
 
-    saving and loading Snap! projects
+    saving and loading Asterisk* projects
 
     written by Jens Mönig
     jens@moenig.org
 
     Copyright (C) 2026 by Jens Mönig
 
-    This file is part of Snap!.
+    This file is part of Asterisk*.
 
-    Snap! is free software: you can redistribute it and/or modify
+    Asterisk* is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
     published by the Free Software Foundation, either version 3 of
     the License, or (at your option) any later version.
@@ -27,7 +27,7 @@
 
     prerequisites:
     --------------
-    needs morphic.js, xml.js, scenes.js and most of Snap!'s other modules
+    needs morphic.js, xml.js, scenes.js and most of Asterisk*'s other modules
 
 
     hierarchy
@@ -261,7 +261,7 @@ SnapSerializer.uber = XML_Serializer.prototype;
 
 // SnapSerializer constants:
 
-SnapSerializer.prototype.app = 'Snap! ' +
+SnapSerializer.prototype.app = 'Asterisk* ' +
     SnapVersion +
     ', https://snap.berkeley.edu';
 
@@ -1735,7 +1735,7 @@ SnapSerializer.prototype.obsoleteBlock = function (isReporter) {
             : new CommandBlockMorph();
     block.selector = 'errorObsolete';
     block.category = 'other';
-    block.color = SpriteMorph.prototype.blockColor.other;
+    block.color = new Color(200);
     block.setSpec('Undefined!');
     block.isDraggable = true;
     return block;
@@ -3011,7 +3011,7 @@ List.prototype.toXML = function (serializer, mediaContext) {
 };
 
 Context.prototype.toXML = function (serializer) {
-    if (this.isContinuation) { // continuations are transient in Snap!
+    if (this.isContinuation) { // continuations are transient in Asterisk*
         return '';
     }
     return serializer.format(
