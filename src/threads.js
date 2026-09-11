@@ -5109,7 +5109,7 @@ Process.prototype.reportTypeOf = function (thing) {
     if (typeof thing === undefined) {
         return 'pending';
     }
-    if (thing === null) {
+    if (thing instanceof Nil) {
         return 'nil';
     }
     if (thing === true || (thing === false)) {
@@ -5615,30 +5615,14 @@ Process.prototype.reportIsIdentical = function (a, b) {
     if (this.isImmutable(a) || this.isImmutable(b)) {
         return snapEquals(a, b);
     }
-
-    function clear() {
-        if (Object.prototype.hasOwnProperty.call(a, tag)) {
-            delete a[tag];
-        }
-        if (Object.prototype.hasOwnProperty.call(b, tag)) {
-            delete b[tag];
-        }
-    }
-
-    clear();
-    a[tag] = Date.now();
-    if (b[tag] === a[tag]) {
-        clear();
-        return true;
-    }
-    clear();
-    return false;
+	
+	return a===b;
 };
 
 Process.prototype.isImmutable = function (obj) {
     // private
     var type = this.reportTypeOf(obj);
-    return type === 'nothing' ||
+    return type === 'nil' ||
         type === 'Boolean' ||
         type === 'text' ||
         type === 'number' ||
