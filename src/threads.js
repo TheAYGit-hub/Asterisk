@@ -96,7 +96,7 @@ function snapEquals(a, b) {
 
     // lists, functions and blocks
     if (a.equalTo || b.equalTo) {
-        if (a.constructor.name === b.constructor.name) {
+        if (a.constructor === b.constructor) {
             return a.equalTo(b);
         }
         return false;
@@ -104,7 +104,7 @@ function snapEquals(a, b) {
 
     // colors (points, rectangles)
     if (a.eq || b.eq) {
-        if (a.constructor.name === b.constructor.name) {
+        if (a.constructor === b.constructor) {
             return a.eq(b, true); // observe alpha
         }
         return false;
@@ -5109,7 +5109,7 @@ Process.prototype.reportTypeOf = function (thing) {
     if (typeof thing === undefined) {
         return 'pending';
     }
-    if (thing instanceof Nil) {
+    if (thing == null) {
         return 'nil';
     }
     if (thing === true || (thing === false)) {
@@ -5118,7 +5118,7 @@ Process.prototype.reportTypeOf = function (thing) {
     if (thing instanceof List) {
         return 'list';
     }
-    if (parseFloat(thing) === +thing) { // I hate this! -Jens
+    if (typeof(thing) == 'number' || thing instanceof Number) {
         return 'number';
     }
     if (isString(thing)) {
@@ -5188,7 +5188,7 @@ Process.prototype.reportTypeOf = function (thing) {
 };
 
 Process.prototype.reportNil = function() {
-    return new Nil()
+    return null;
 }
 // Process math primtives - hyper
 
@@ -10672,7 +10672,7 @@ Context.prototype.updateEmptySlots = function () {
 // Variable /////////////////////////////////////////////////////////////////
 
 function Variable(value, isTransient, isHidden) {
-    this.value = value;
+    this.value = value === void 0 ? null : value;
     this.isTransient = isTransient || false; // prevent value serialization
     this.isHidden = isHidden || false; // not shown in the blocks palette
 }
@@ -10876,10 +10876,7 @@ VariableFrame.prototype.getVar = function (name, proc) {
             return value;
         }
         value = frame.vars[name].value;
-        return (value === 0 ? 0
-                : value === false ? false
-                        : value === '' ? ''
-                            : value || 0); // don't return null
+        return (value === void 0 ? null : value); // don't return void
     }
     if (typeof name === 'number') {
         // empty input with a Binding-ID called without an argument
@@ -10894,9 +10891,7 @@ VariableFrame.prototype.getVar = function (name, proc) {
 };
 
 VariableFrame.prototype.addVar = function (name, value) {
-    this.vars[name] = new Variable(value === 0 ? 0
-              : value === false ? false
-                       : value === '' ? '' : value || 0);
+    this.vars[name] = new Variable(value === void 0 ? null : value);
 };
 
 VariableFrame.prototype.deleteVar = function (name) {
