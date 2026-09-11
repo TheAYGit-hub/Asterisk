@@ -3078,57 +3078,58 @@ BlockDialogMorph.prototype.fixCategoriesLayout = function () {
     this.categories.setWidth(
         3 * xPadding + 2 * buttonWidth
     );
-
+		let categoryCount = SpriteMorph.prototype.categories.length;
+  	let paneHeight = Math.ceil(categoryCount/2)
     this.categories.children.forEach((button, i) => {
-        if (i < 8) {
-            row = i % 4;
-            col = Math.ceil((i + 1) / 4);
-        } else if (i < 10) {
-            row = 4;
+        if (i < categoryCount) {
+            row = i % paneHeight;
+            col = Math.ceil((i + 1) / paneHeight);
+        } else if (i < categoryCount) {
+            row = paneHeight;
             col = 3 - (10 - i);
         } else {
-            row = i - 5;
+            row = i - (paneHeight);
             col = 1;
         }
         button.setPosition(new Point(
             l + (col * xPadding + ((col - 1) * buttonWidth)),
             t + ((row + 1) * yPadding + (row * buttonHeight) + border) +
-                (i > 9 ? border / 2 : 0)
+                (i > categoryCount-1 ? border / 2 : 0)
         ));
     });
 
-    if (more > 6) {
+    if (more) {
         scroller = new ScrollFrameMorph(
             null,
             null,
             SpriteMorph.prototype.sliderColor.lighter()
         );
-        scroller.setColor(this.categories.color);
-        scroller.acceptsDrops = false;
-        scroller.contents.acceptsDrops = false;
         scroller.setPosition(
             new Point(
                 this.categories.left() + this.categories.border,
-                this.categories.children[10].top()
+                this.categories.children[categoryCount].top()
             )
         );
+        scroller.setColor(this.categories.color);
+        scroller.acceptsDrops = false;
+        scroller.contents.acceptsDrops = false;
         scroller.setWidth(this.categories.width() - this.categories.border * 2);
         scroller.setHeight(buttonHeight * 6 + yPadding * 5);
 
         for (i = 0; i < more; i += 1) {
-            scroller.addContents(this.categories.children[10]);
+            scroller.addContents(this.categories.children[categoryCount]);
         }
         this.categories.add(scroller);
         this.categories.setHeight(
-            (5 + 1) * yPadding
-                + 5 * buttonHeight
-                + 6 * (yPadding + buttonHeight) + border + 2
+            ((paneHeight) + 1) * yPadding
+                + paneHeight * buttonHeight
+                + 5 * (yPadding + buttonHeight) + border + 2
                 + 2 * border
         );
     } else {
         this.categories.setHeight(
-            (5 + 1) * yPadding
-                + 5 * buttonHeight
+            (paneHeight) * yPadding
+                + (paneHeight) * buttonHeight
                 + (more ? (more * (yPadding + buttonHeight) + border / 2) : 0)
                 + 2 * border
         );
