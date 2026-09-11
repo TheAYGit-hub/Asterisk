@@ -5109,7 +5109,7 @@ Process.prototype.reportTypeOf = function (thing) {
     if (typeof thing === undefined) {
         return 'pending';
     }
-    if (thing == null) {
+    if (thing === null) {
         return 'nil';
     }
     if (thing === true || (thing === false)) {
@@ -5118,7 +5118,7 @@ Process.prototype.reportTypeOf = function (thing) {
     if (thing instanceof List) {
         return 'list';
     }
-    if (typeof(thing) == 'number' || thing instanceof Number) {
+    if (typeof(thing) === 'number' || thing instanceof Number) {
         return 'number';
     }
     if (isString(thing)) {
