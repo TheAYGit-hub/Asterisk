@@ -287,7 +287,7 @@ List.prototype.at = function (index) {
         }
     }
     value = pair.contents[idx - 1];
-    return isNil(value) ? '' : value;
+    return value ?? null;
 };
 
 List.prototype.contains = function (element) {
@@ -332,11 +332,11 @@ List.prototype.indexOf = function (element) {
 
 // List key-value accessing (experimental in v8.1):
 
-List.prototype.lookup = function (key, ifNone = '') {
+List.prototype.lookup = function (key, ifNone = null) {
     // look up the value of a given key, return optional ifNone value,
     // which can also be a niladic callback, or an empty string
     var rec, parent;
-    if (parseFloat(key) === +key) { // treat as numerical index
+    if (typeof key === 'number' || key instanceof Number) { // treat as numerical index
         return this.at(key);
     }
     rec = this.itemsArray().find(elem => elem instanceof List &&
