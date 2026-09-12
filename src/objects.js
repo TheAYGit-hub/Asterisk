@@ -124,7 +124,6 @@ function isSnapObject(thing) {
     return thing instanceof SpriteMorph || (thing instanceof StageMorph);
 }
 
-Nil = class Nil {}
 // Struct //////////////////////////////////////////////////////////////
 
 // I am a struct, Asterisk*'s replacement for abstract data types.
@@ -369,7 +368,12 @@ StructInspectorMorph = class StructInspectorMorph extends InspectorMorph {
         this.fixLayout();
     };
 }
-        
+
+Nil = class Nil {
+	static [Symbol.hasInstance](obj){
+		return obj?.constructor === Nil || obj === null;
+	}
+}
 // SpriteMorph /////////////////////////////////////////////////////////
 
 // I am a scriptable object
