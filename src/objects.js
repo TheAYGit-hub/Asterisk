@@ -121,7 +121,11 @@ function isSnapObject(thing) {
     return thing instanceof SpriteMorph || (thing instanceof StageMorph);
 }
 
-Nil = class Nil {}
+Nil = class Nil {
+	static [Symbol.hasInstance](obj){
+		return obj?.constructor === Nil || obj === null;
+	}
+}
 // SpriteMorph /////////////////////////////////////////////////////////
 
 // I am a scriptable object
