@@ -4761,7 +4761,7 @@ SpriteMorph.prototype.customBlockTemplatesForCategory = function (
         inheritedBlocks.forEach(addCustomBlock);
     }
 
-    return blocks.concat(category=='control'?this.customBlockTemplatesForCategory('events',includeHidden):[]);
+    return [...(category=='control'?this.customBlockTemplatesForCategory('events',includeHidden):[]),...blocks];
 };
 
 SpriteMorph.prototype.makeBlockButton = function (category) {
