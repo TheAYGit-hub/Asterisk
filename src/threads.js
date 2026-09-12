@@ -5110,7 +5110,7 @@ Process.prototype.reportTypeOf = function (thing) {
         return 'pending';
     }
     if (thing instanceof Nil) {
-        return 'nil';
+        return 'nothing';
     }
     if (thing === true || (thing === false)) {
         return 'boolean';

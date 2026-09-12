@@ -2694,7 +2694,35 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
             ide.showMessage(error.message, 2, true);
         }
     }
-    if (value instanceof ListWatcherMorph) {
+    if (value instanceof Struct) {
+        var obj = value.contents.map(pair => obj[pair[0]] = pair[1])
+        morphToShow = new StructInspectorMorph(Object.fromEntries(value.contents))
+    } else if (value instanceof SpriteMorph || value instanceof StageMorph) {
+        var cst = value.copy()
+        
+        morphToShow = new SpriteIconMorph(value)
+        // support costumes to be dragged out of result bubbles:
+        morphToShow.isDraggable = !value.isTemporary && !SpriteMorph.prototype.disableDraggingData;
+
+        morphToShow.selectForEdit = value instanceof StageMorph ? null : function () {
+            var icon, prepare;
+            console.log(value.isTemporary)
+
+            icon = new SpriteIconMorph(cst);
+            prepare = icon.prepareToBeGrabbed;
+
+            icon.prepareToBeGrabbed = function (hand) {
+                hand.grabOrigin = {
+                    origin: ide.palette,
+                    position: ide.palette.center()
+                };
+                this.prepareToBeGrabbed = prepare;
+            };
+
+            icon.setCenter(this.center());
+            return icon;
+        };
+    } else if (value instanceof ListWatcherMorph) {
         morphToShow = value;
         morphToShow.update(true);
         morphToShow.step = value.update;
@@ -2820,15 +2848,7 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
                 };
             }
         }
-    } else if (value instanceof Costume) {
-        img = value.thumbnail(new Point(40, 40));
-        morphToShow = new Morph();
-        /*morphToShow = new Morph();
-        morphToShow.isCachingImage = true;
-        morphToShow.bounds.setWidth(img.width);
-        morphToShow.bounds.setHeight(img.height);
-        morphToShow.cachedImage = img;*/
-        
+    } else if (value instanceof Costume) {        
         morphToShow = new CostumeIconMorph(value)
         // support costumes to be dragged out of result bubbles:
         morphToShow.isDraggable = !SpriteMorph.prototype.disableDraggingData;
@@ -2961,7 +2981,7 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
     } else if (value instanceof Nil) {
         maxHeight = ide.height() / 2;
         morphToShow = new TextMorph(
-            'nil',
+            'nothing',
             this.fontSize,
             0,
             true,

@@ -98,7 +98,10 @@ CustomBlockDefinition, exportEmbroidery, CustomHatBlockMorph, HandMorph*/
 
 modules.objects = '2026-August-27';
 
-var Nil
+var Nil;
+var Struct;
+var StructInspectorMorph;
+var StructClass;
 var SpriteMorph;
 var StageMorph;
 var SpriteBubbleMorph;
@@ -122,12 +125,256 @@ function isSnapObject(thing) {
 }
 
 Nil = class Nil {}
+// Struct //////////////////////////////////////////////////////////////
+
+// I am a struct, Asterisk*'s replacement for abstract data types.
+
+Struct = class Struct {
+    constructor(list = [], sclass = new Nil()) {
+        var plist
+        if (list instanceof List) {
+            plist = list.contents.map((sub, index) => sub instanceof List ? sub.contents : [index, sub]);
+        }
+        plist = list.map((sub, index) => sub instanceof List ? sub.contents : [String(index), sub]);
+        this.contents = plist;
+        this.class = sclass;
+        this.morph = sclass instanceof Nil ? Nil : sclass.morph;
+    }
+    toString = function constructor() {
+        return `a Struct${this.class instanceof Nil ? '' : ' ' + this.class.name}`
+    }
+}
+
+StructInspectorMorph = class StructInspectorMorph extends InspectorMorph {
+    buildPanes() {
+        var attribs = [], property, ctrl, ev, doubleClickAction;
+        
+        // remove existing panes
+        this.children.forEach(m => {
+            if (m !== this.work) { // keep work pane around
+                m.destroy();
+            }
+        });
+        this.children = [];
+    
+        // label
+        this.label = new TextMorph(this.target.toString());
+        this.label.fontSize = MorphicPreferences.menuFontSize;
+        this.label.isBold = true;
+        this.label.color = WHITE;
+        this.add(this.label);
+    
+        // properties list
+        for (property in this.target) {
+            if (property) { // dummy condition, to be refined
+                attribs.push(property);
+            }
+        }
+        if (this.showing === 'attributes') {
+            attribs = attribs.filter(
+                prop => !(this.target[prop] instanceof Context)
+            );
+        } else if (this.showing === 'methods') {
+            attribs = attribs.filter(
+                prop => this.target[prop] instanceof Context
+            );
+        } // otherwise show all properties
+    
+        doubleClickAction = () => {
+            var world, inspector;
+            if (!isObject(this.currentProperty)) {return; }
+            world = this.world();
+            inspector = new InspectorMorph(
+                this.currentProperty
+            );
+            inspector.setPosition(world.hand.position());
+            inspector.keepWithin(world);
+            world.add(inspector);
+            inspector.changed();
+        };
+    
+        this.list = new ListMorph(
+            this.target instanceof Array ? attribs : attribs.sort(),
+            null, // label getter
+            this.markOwnProperties ?
+                    [ // format list
+                        [ // format element: [color, predicate(element]
+                            new Color(0, 0, 180),
+                            element => {
+                                return Object.prototype.hasOwnProperty.call(
+                                    this.target,
+                                    element
+                                );
+                            }
+                        ]
+                    ]
+                    : null,
+            doubleClickAction
+        );
+    
+        this.list.action = () => {
+            this.hasUserEditedDetails = false;
+            this.updateCurrentSelection();
+        };
+    
+        this.list.hBar.alpha = 0.6;
+        this.list.vBar.alpha = 0.6;
+        this.list.contents.step = null;
+        this.add(this.list);
+    
+        // details pane
+        this.detail = new ScrollFrameMorph();
+        this.detail.acceptsDrops = false;
+        this.detail.contents.acceptsDrops = false;
+        this.detail.isTextLineWrapping = true;
+        this.detail.color = WHITE;
+        this.detail.hBar.alpha = 0.6;
+        this.detail.vBar.alpha = 0.6;
+        ctrl = new TextMorph('');
+        ctrl.isEditable = true;
+        ctrl.enableSelecting();
+        ctrl.setReceiver(this.target);
+        this.detail.setContents(ctrl);
+        this.add(this.detail);
+    
+        // work ('evaluation') pane
+        // don't refresh the work pane if it already exists
+        if (this.work === null) {
+            this.work = new ScrollFrameMorph();
+            this.work.acceptsDrops = false;
+            this.work.contents.acceptsDrops = false;
+            this.work.isTextLineWrapping = true;
+            this.work.color = WHITE;
+            this.work.hBar.alpha = 0.6;
+            this.work.vBar.alpha = 0.6;
+            ev = new TextMorph('');
+            ev.isEditable = true;
+            ev.enableSelecting();
+            ev.setReceiver(this.target);
+            this.work.setContents(ev);
+        }
+        this.add(this.work);
+    
+        // properties button
+        this.buttonSubset = new TriggerMorph();
+        this.buttonSubset.labelString = 'show...';
+        this.buttonSubset.createLabel();
+        this.buttonSubset.action = () => {
+            var menu;
+            menu = new MenuMorph();
+            menu.addItem(
+                'attributes',
+                () => {
+                    this.showing = 'attributes';
+                    this.buildPanes();
+                }
+            );
+            menu.addItem(
+                'methods',
+                () => {
+                    this.showing = 'methods';
+                    this.buildPanes();
+                }
+            );
+            menu.addItem(
+                'all',
+                () => {
+                    this.showing = 'all';
+                    this.buildPanes();
+                }
+            );
+            menu.addLine();
+            menu.addItem(
+                (this.markOwnProperties ?
+                        'un-mark own' : 'mark own'),
+                () => {
+                    this.markOwnProperties = !this.markOwnProperties;
+                    this.buildPanes();
+                },
+                'highlight\n\'own\' properties'
+            );
+            menu.popUpAtHand(this.world());
+        };
+    
+        this.add(this.buttonSubset);
+    
+        // inspect button
+        this.buttonInspect = new TriggerMorph();
+        this.buttonInspect.labelString = 'inspect...';
+        this.buttonInspect.createLabel();
+        this.buttonInspect.action = () => {
+            var menu, world, inspector;
+            if (isObject(this.currentProperty)) {
+                menu = new MenuMorph();
+                menu.addItem(
+                    'in new inspector...',
+                    () => {
+                        world = this.world();
+                        inspector = new InspectorMorph(
+                            this.currentProperty
+                        );
+                        inspector.setPosition(world.hand.position());
+                        inspector.keepWithin(world);
+                        world.add(inspector);
+                        inspector.changed();
+                    }
+                );
+                menu.addItem(
+                    'here...',
+                    () => this.setTarget(this.currentProperty)
+                );
+                menu.popUpAtHand(this.world());
+            } else {
+                this.inform(
+                    (this.currentProperty === null ?
+                            'null' : typeof this.currentProperty) +
+                                '\nis not inspectable'
+                );
+            }
+        };
+        this.add(this.buttonInspect);
+    
+        // edit button
+        this.buttonEdit = new TriggerMorph();
+        this.buttonEdit.labelString = 'edit...';
+        this.buttonEdit.createLabel();
+        this.buttonEdit.action = () => {
+            var menu = new MenuMorph(this);
+            menu.addItem("save", 'save', 'accept changes');
+            menu.addLine();
+            menu.addItem("add property...", 'addProperty');
+            menu.addItem("rename...", 'renameProperty');
+            menu.addItem("remove...", 'removeProperty');
+            menu.popUpAtHand(this.world());
+        };
+        this.add(this.buttonEdit);
+    
+        // close button
+        this.buttonClose = new TriggerMorph();
+        this.buttonClose.labelString = 'close';
+        this.buttonClose.createLabel();
+        this.buttonClose.action = () => this.destroy();
+        this.add(this.buttonClose);
+    
+        // resizer
+        this.resizer = new HandleMorph(
+            this,
+            150,
+            100,
+            this.edge,
+            this.edge
+        );
+    
+        // update layout
+        this.fixLayout();
+    };
+}
+        
 // SpriteMorph /////////////////////////////////////////////////////////
 
 // I am a scriptable object
 
 // SpriteMorph inherits from PenMorph:
-
 SpriteMorph.prototype = new PenMorph();
 SpriteMorph.prototype.constructor = SpriteMorph;
 SpriteMorph.uber = PenMorph.prototype;
@@ -164,7 +411,6 @@ SpriteMorph.prototype.categories =
         'sound',
 
         'machines',
-        'events',
         'looks',
         'sensing',
         'numbers',
@@ -184,7 +430,7 @@ SpriteMorph.prototype.blockColor = {
     looks : new Color(143, 86, 227),
     sprites : new Color(60, 70, 150),
     sensing : new Color(4, 148, 220),
-    strings : new Color(17, 200, 163),
+    strings : new Color(230, 115, 204),
     numbers : new Color(98, 194, 19),
     variables : new Color(243, 118, 29),
     lists : new Color(217, 77, 17),
@@ -1164,60 +1410,60 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         // Control
         receiveGo: {
             type: 'hat',
-            category: 'control',
+            category: 'events',
             spec: 'when $greenflag clicked'
         },
         receiveKey: {
             type: 'hat',
-            category: 'control',
+            category: 'events',
             spec: 'when %keyHat key pressed %keyName',
             defaults: [['space']]
         },
         receiveInteraction: {
             type: 'hat',
-            category: 'control',
+            category: 'events',
             spec: 'when I am %interaction',
             defaults: [['clicked']]
         },
         receiveMessage: {
             type: 'hat',
-            category: 'control',
+            category: 'events',
             spec: 'when I receive %msgHat %message',
             defaults: [['']] // trigger the "message" expansion to refresh
         },
         receiveCondition: {
             type: 'hat',
-            category: 'control',
+            category: 'events',
             spec: 'when %b'
         },
         receiveConditionEvent: {
             type: 'hat',
-            category: 'control',
+            category: 'events',
             spec: 'when %b'
         },
         getLastMessage: {  // retained for legacy compatibility
             dev: true,
             type: 'reporter',
             reports: 'text',
-            category: 'control',
+            category: 'events',
             spec: 'message'
         },
         doBroadcast: {
             type: 'command',
-            category: 'control',
+            category: 'events',
             spec: 'broadcast %msg %receive',
             code: 'send'
         },
         doBroadcastAndWait: {
             type: 'command',
-            category: 'control',
+            category: 'events',
             spec: 'broadcast %msg %receive and wait',
             code: 'sendAll'
         },
         reportPoll: {
             type: 'reporter',
             reports: 'any',
-            category: 'control',
+            category: 'events',
             spec: 'request %msg %survey',
             code: 'request'
         },
@@ -2042,7 +2288,7 @@ SpriteMorph.prototype.primitiveBlocks = function () {
         },
         reportNil: {
             type: 'reporter',
-            reports: 'nil',
+            reports: 'nothing',
             category: 'numbers',
             spec: 'nothing',
             alias: 'nil nothing',
@@ -15443,8 +15689,12 @@ CellMorph.prototype.dataAsMorph = function (data) {
                 }
             }
         };
-
-    if (data instanceof Morph) {
+    if (data instanceof SpriteMorph || data instanceof StageMorph) {
+        var cst = data.copy()
+        
+        contents = new SpriteIconMorph(data)
+    
+    } else if (data instanceof Morph) {
         if (isSnapObject(data)) {
             img = data.thumbnail(new Point(40, 40));
         } else {
@@ -15459,7 +15709,7 @@ CellMorph.prototype.dataAsMorph = function (data) {
     } else if (data instanceof Nil) {
         maxHeight = ide.height() / 2;
         morphToShow = new TextMorph(
-            'nil',
+            'nothing',
             this.fontSize,
             0,
             true,
@@ -15562,68 +15812,9 @@ CellMorph.prototype.dataAsMorph = function (data) {
             return script;
         };
     } else if (data instanceof Costume) {
-        img = data.thumbnail(new Point(40, 40));
-        /*contents = new Morph();
-        contents.isCachingImage = true;
-        contents.bounds.setWidth(img.width);
-        contents.bounds.setHeight(img.height);
-        contents.cachedImage = img*/
-        
         contents = new CostumeIconMorph(data)
-        // support costumes to be dragged out of watchers:
-        contents.isDraggable = draggable;
-        contents.selectForEdit = function () {
-            var cst = myself.contents.copy(),
-                icon,
-                prepare,
-                ide = this.parentThatIsA(IDE_Morph)||
-                    this.world().childThatIsA(IDE_Morph);
-
-            cst.name = ide.currentSprite.newCostumeName(cst.name);
-            icon = new CostumeIconMorph(cst);
-            prepare = icon.prepareToBeGrabbed;
-
-            icon.prepareToBeGrabbed = function (hand) {
-                hand.grabOrigin = {
-                    origin: ide.palette,
-                    position: ide.palette.center()
-                };
-                this.prepareToBeGrabbed = prepare;
-            };
-
-            if (ide.isAppMode) {return; }
-            icon.setCenter(this.center());
-            return icon;
-        };
-        
     } else if (data instanceof Sound) {
         contents = new SoundIconMorph(data)
-
-        // support sounds to be dragged out of watchers:
-        contents.isDraggable = draggable;
-        contents.selectForEdit = function () {
-            var snd = myself.contents.copy(),
-                icon,
-                prepare,
-                ide = this.parentThatIsA(IDE_Morph)||
-                    this.world().childThatIsA(IDE_Morph);
-
-            snd.name = ide.currentSprite.newCostumeName(snd.name);
-            icon = new SoundIconMorph(snd);
-            prepare = icon.prepareToBeGrabbed;
-
-            icon.prepareToBeGrabbed = function (hand) {
-                hand.grabOrigin = {
-                    origin: ide.palette,
-                    position: ide.palette.center()
-                };
-                this.prepareToBeGrabbed = prepare;
-            };
-
-            if (ide.isAppMode) {return; }
-            icon.setCenter(this.center());
-            return icon;
-        };
     } else if (data instanceof List) {
         if (data.isADT()) {
             // attempt to render the '_morph' method for a custom view.
