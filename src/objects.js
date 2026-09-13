@@ -413,7 +413,7 @@ SpriteMorph.prototype.categories =
         'structs',
         'project',
         'sound',
-
+        'events',
         'machines',
         'looks',
         'sensing',
@@ -424,7 +424,7 @@ SpriteMorph.prototype.categories =
         'lambda',
         'other'
     ];
-
+SpriteMorph.prototype.excludedCategories = ['events'];
 SpriteMorph.prototype.blockColor = {
     motion : new Color(72, 108, 212),
     machines : new Color(49, 72, 170),
@@ -4761,7 +4761,7 @@ SpriteMorph.prototype.customBlockTemplatesForCategory = function (
         inheritedBlocks.forEach(addCustomBlock);
     }
 
-    return blocks;
+    return [...(category=='control'?this.customBlockTemplatesForCategory('events',includeHidden):[]),...blocks];
 };
 
 SpriteMorph.prototype.makeBlockButton = function (category) {

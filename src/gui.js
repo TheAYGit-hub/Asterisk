@@ -1888,15 +1888,17 @@ IDE_Morph.prototype.primitiveCategories = function () {
     // or stage) in the current scene are answered
     var categories = SpriteMorph.prototype.categories, all;
     if (!this.scene.hideEmptyCategories) {
-        return categories;
+        return categories.filter(cat=>!SpriteMorph.prototype.excludedCategories?.includes(cat));
     }
     all = this.sprites.asArray();
     if (this.stage) {
         all = all.concat(this.stage);
     }
-    return categories.filter(prim =>
-        all.some(agent =>
-            agent.populatedCategories()[prim]));
+    return categories
+        .filter(cat=>!SpriteMorph.prototype.excludedCategories?.includes(cat))
+        .filter(prim =>
+            all.some(agent =>
+                agent.populatedCategories()[prim]));
 };
 
 IDE_Morph.prototype.refreshEmptyCategories = function () {
