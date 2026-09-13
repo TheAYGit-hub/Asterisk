@@ -12690,7 +12690,7 @@ InputSlotMorph.prototype.typesMenu = function () {
     dict.predicate = ['predicate'];
     dict.hat = ['hat'];
     dict.process = ['process'];
-    dict.nil = ['nil'],
+    dict.nothing = ['nothing'],
     
     dict['~'] = null;
     // the following entries are collective types and thus not unique:
@@ -13285,7 +13285,6 @@ InputSlotMorph.prototype.evaluate = function () {
     }
     val = this.contents().text;
     if (this.isNumeric &&
-        !this.isAlphanumeric &&
         (!this.evaluateAsString || val === '')
     ) {
         num = +val;
