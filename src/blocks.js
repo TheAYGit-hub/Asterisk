@@ -13285,7 +13285,6 @@ InputSlotMorph.prototype.evaluate = function () {
     }
     val = this.contents().text;
     if (this.isNumeric &&
-        !this.isAlphanumeric &&
         (!this.evaluateAsString || val === '')
     ) {
         num = +val;
