@@ -15693,7 +15693,16 @@ CellMorph.prototype.dataAsMorph = function (data) {
                 }
             }
         };
-    if (data instanceof SpriteMorph || data instanceof StageMorph) {
+    if (data instanceof Nil) {
+        contents = new TextMorph(
+            'nothing',
+            this.fontSize,
+            0,
+            true,
+            true
+        )
+        contents.setColor(new Color(90, 90, 90)) 
+    } else if (data instanceof SpriteMorph || data instanceof StageMorph) {
         var cst = data.copy()
         
         contents = new SpriteIconMorph(data)
