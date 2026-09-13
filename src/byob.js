@@ -3078,7 +3078,7 @@ BlockDialogMorph.prototype.fixCategoriesLayout = function () {
     this.categories.setWidth(
         3 * xPadding + 2 * buttonWidth
     );
-		let categoryCount = SpriteMorph.prototype.categories.length;
+	let categoryCount = SpriteMorph.prototype.categories.length;
   	let paneHeight = Math.ceil(categoryCount/2)
     this.categories.children.forEach((button, i) => {
         if (i < categoryCount) {
@@ -3088,13 +3088,13 @@ BlockDialogMorph.prototype.fixCategoriesLayout = function () {
             row = paneHeight;
             col = 3 - (10 - i);
         } else {
-            row = i - (paneHeight);
+            row = i - (paneHeight-(categoryCount%2));
             col = 1;
         }
         button.setPosition(new Point(
             l + (col * xPadding + ((col - 1) * buttonWidth)),
             t + ((row + 1) * yPadding + (row * buttonHeight) + border) +
-                (i > categoryCount-1 ? border / 2 : 0)
+                (i >= categoryCount ? border / 2 : 0)
         ));
     });
 
