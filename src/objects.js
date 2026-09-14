@@ -15714,16 +15714,6 @@ CellMorph.prototype.dataAsMorph = function (data) {
         contents.bounds.setHeight(img.height);
         contents.cachedImage = img;
         this.version = data.version;
-    } else if (data instanceof Nil) {
-        maxHeight = ide.height() / 2;
-        morphToShow = new TextMorph(
-            'nothing',
-            this.fontSize,
-            0,
-            true,
-            true
-        )
-        morphToShow.setColor(new Color(90, 90, 90)) 
     } else if (typeof data === 'string') {
         contents = new (data.includes('\n') ? TextSlotMorph : InputSlotMorph)(data)
         if (this.isEditable) {
