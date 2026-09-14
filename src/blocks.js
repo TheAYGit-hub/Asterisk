@@ -2696,7 +2696,7 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
     }
     if (value instanceof Struct) {
         var obj = value.contents.map(pair => obj[pair[0]] = pair[1])
-        morphToShow = new StructInspectorMorph(Object.fromEntries(value.contents))
+        morphToShow = new StructInspectorMorph(Object.fromEntries(obj))
     } else if (value instanceof SpriteMorph || value instanceof StageMorph) {
         var cst = value.copy()
         
@@ -2980,26 +2980,17 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
         );
     } else if (value instanceof Nil) {
         maxHeight = ide.height() / 2;
-        morphToShow = new TextMorph(
-            'nothing',
-            this.fontSize,
-            0,
-            true,
-            true
-        )
+        morphToShow = new TextSlotMorph(['nothing'], 1)
+        
+        morphToShow.setColor(SpriteMorph.prototype.blockColor.other)
         morphToShow.setColor(new Color(90, 90, 90)) 
     } else if (typeof value == 'string') {
         // shorten the string, commented out because we now scroll it
         // txt  = value.length > 500 ? value.slice(0, 500) + '...' : value;
         maxHeight = ide.height() / 2;
-        morphToShow = new TextMorph(
-            `"${value}"`,
-            this.fontSize,
-            0,
-            false
-        );
+        morphToShow = new (value.includes('\n') ? TextSlotMorph : InputSlotMorph)(value)
         
-        morphToShow.color = SpriteMorph.prototype.blockColor.strings;
+        morphToShow.setColor(SpriteMorph.prototype.blockColor.strings)
         if (morphToShow.height() > maxHeight) { // scroll
             scroller = new ScrollFrameMorph();
             scroller.acceptsDrops = false;
@@ -3032,15 +3023,9 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
         // shorten the string, commented out because we now scroll it
         // txt  = value.length > 500 ? value.slice(0, 500) + '...' : value;
         maxHeight = ide.height() / 2;
-        morphToShow = new TextMorph(
-            `${value}`,
-            this.fontSize,
-            0,
-            false,
-            true
-        );
+        morphToShow = new InputSlotMorph(String(value), 1)
         
-        morphToShow.color = SpriteMorph.prototype.blockColor.numbers;
+        morphToShow.setColor(SpriteMorph.prototype.blockColor.numbers)
         if (morphToShow.height() > maxHeight) { // scroll
             scroller = new ScrollFrameMorph();
             scroller.acceptsDrops = false;
@@ -3070,15 +3055,9 @@ SyntaxElementMorph.prototype.showBubble = function (value, exportPic, target) {
             return menu;
         };
     } else if (value instanceof Point) {
-        morphToShow = new TextMorph(
-            `@ x: ${value.x}\n@ y: ${value.y}`,
-            this.fontSize,
-            0,
-            true,
-            true
-        );
+        morphToShow = new TextSlotMorph(`${value.x}\n${value.x}`, 1)
 
-        morphToShow.color = SpriteMorph.prototype.blockColor.vectors;
+        morphToShow.setColor(SpriteMorph.prototype.blockColor.vectors)
         
         // support exporting text / numbers directly from result bubbles:
         morphToShow.userMenu = function () {

@@ -15694,14 +15694,9 @@ CellMorph.prototype.dataAsMorph = function (data) {
             }
         };
     if (data instanceof Nil) {
-        contents = new TextMorph(
-            'nothing',
-            this.fontSize,
-            0,
-            true,
-            true
-        )
-        contents.setColor(new Color(90, 90, 90)) 
+        contents = new TextSlotMorph(['nothing'], 1)
+        
+        contents.setColor(SpriteMorph.prototype.blockColor.other) 
     } else if (data instanceof SpriteMorph || data instanceof StageMorph) {
         var cst = data.copy()
         
@@ -15730,49 +15725,21 @@ CellMorph.prototype.dataAsMorph = function (data) {
         )
         morphToShow.setColor(new Color(90, 90, 90)) 
     } else if (typeof data === 'string') {
-        txt = data.length > 500 ?
-                data.slice(0, 500) + '...' : data;
-        contents = new TextMorph(
-            `"${txt}"`,
-            fontSize,
-            null,
-            true,
-            false,
-            'left' // was formerly 'center', reverted b/c of code-mapping
-        );
+        contents = new (data.includes('\n') ? TextSlotMorph : InputSlotMorph)(data)
         if (this.isEditable) {
             contents.isEditable = true;
-            contents.enableSelecting();
         }
         contents.setColor(SpriteMorph.prototype.blockColor.strings)
     } else if (typeof data === 'number') {
-        txt = String(data).length > 500 ?
-                String(data).slice(0, 500) + '...' : String(data);
-        contents = new TextMorph(
-            txt, //EEEEEED
-            fontSize,
-            null,
-            true,
-            true,
-            'left'
-        );
+        contents = new InputSlotMorph(String(data), 1)
         if (this.isEditable) {
             contents.isEditable = true;
-            contents.enableSelecting();
         }
         contents.setColor(SpriteMorph.prototype.blockColor.numbers)
     } else if (data instanceof Point) {
-        contents = new TextMorph(
-            `@ x: ${data.x}\n@ y: ${data.y}`,
-            fontSize,
-            null,
-            true,
-            true,
-            'left'
-        );
+        contents = new TextSlotMorph(`${data.x}\n${data.x}`, 1)
         if (this.isEditable) {
             contents.isEditable = true;
-            contents.enableSelecting();
         }
         contents.setColor(SpriteMorph.prototype.blockColor.vectors)
     } else if (data instanceof Process) {
